@@ -1,0 +1,11 @@
+services:
+  mongo:
+    image: mongo:7
+    container_name: ai-wrapper-mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - wrapper-mongo:/data/db
+
+volumes:
+  wrapper-mongo:

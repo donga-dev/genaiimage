@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <rect width="32" height="32" rx="9" fill="#101218"/>
+  <defs>
+    <linearGradient id="lumina" x1="6" y1="6" x2="26" y2="26" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#4ea1ff"/>
+      <stop offset="0.42" stop-color="#8b7cff"/>
+      <stop offset="0.72" stop-color="#f472b6"/>
+      <stop offset="1" stop-color="#fb923c"/>
+    </linearGradient>
+  </defs>
+  <circle cx="16" cy="16" r="9.5" fill="url(#lumina)"/>
+  <circle cx="16" cy="16" r="2.6" fill="#fff"/>
+</svg>

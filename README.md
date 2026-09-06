@@ -1,36 +1,119 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Wrapper — Admin Credit Portal
 
-## Getting Started
+Admin-only Next.js portal. Admins sign up, buy credit packs, and their other product deducts **1 credit per API hit**. There are no monthly or yearly plans — credits last until they are used.
 
-First, run the development server:
+## What it does
+
+- Admin signup / login (name, company, email, phone)
+- 3 dynamic credit packs stored in MongoDB
+- Razorpay checkout for credit packs; credits are added only after payment is verified
+- Internal APIs for another project: **check credits** and **deduct 1 credit**
+- Usage ledger: who used the hit (end-user email), when, remaining credits
+- Portal pages: overview, packs, usage filters, purchases, account
+
+## Default packs (change via seed)
+
+| Pack | Credits | Rate | Total |
+| --- | --- | --- | --- |
+| Starter | 10 | ₹10 / credit | ₹100 |
+| Growth | 50 | ₹9 / credit | ₹450 |
+| Bulk | 100 | ₹8 / credit | ₹800 |
+
+Buy more at once → cheaper per credit. Edit `scripts/seed.ts` and run `npm run seed` again to upsert new rates.
+
+## Setup
+
+1. Run MongoDB locally (`docker compose up -d`), install it, or use Atlas.
+2. Copy env values:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+copy .env.example .env.local
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+3. Set `MONGODB_URI`, `JWT_SECRET`, `INTERNAL_API_TOKEN`, and Razorpay keys in `.env.local`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Razorpay
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. Create keys from the [Razorpay dashboard](https://dashboard.razorpay.com/app/website-app-settings/api-keys) (use Test mode first).
+2. Put `RAZORPAY_KEY_ID` and `RAZORPAY_KEY_SECRET` in `.env.local`, then restart `npm run dev`.
+3. Optional but recommended in production: add a webhook to `https://your-domain/api/purchases/webhook` for `payment.captured` and `order.paid`, and set `RAZORPAY_WEBHOOK_SECRET`.
 
-## Learn More
+Flow: Buy pack → Razorpay order → checkout modal → signature verify → credits added. The checkout handler works on localhost. Webhook is the backup if the browser closes after a successful pay.
 
-To learn more about Next.js, take a look at the following resources:
+Test card (Razorpay test mode): `4111 1111 1111 1111`, any future expiry, any CVV.
+4. Install and seed:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+npm install
+npm run seed
+npm run dev
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Open [http://localhost:3000](http://localhost:3000). This portal is admin-only.
 
-## Deploy on Vercel
+## APIs for your other project
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Send the **internal token** on every call:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Header `x-internal-token: <INTERNAL_API_TOKEN>`
+- or `Authorization: Bearer <INTERNAL_API_TOKEN>`
+
+Admin **id** and **email** are on the Account page after login.
+
+### Check credits
+
+`POST /api/v1/credits/check`
+
+```json
+{
+  "adminId": "ADMIN_OBJECT_ID",
+  "adminEmail": "admin@company.com"
+}
+```
+
+Success:
+
+```json
+{
+  "ok": true,
+  "hasCredits": true,
+  "credits": 42,
+  "adminId": "...",
+  "adminEmail": "admin@company.com"
+}
+```
+
+### Deduct 1 credit (one hit)
+
+`POST /api/v1/credits/deduct`
+
+```json
+{
+  "adminId": "ADMIN_OBJECT_ID",
+  "adminEmail": "admin@company.com",
+  "userEmail": "enduser@client.com",
+  "source": "chat"
+}
+```
+
+`userEmail` is the person inside the admin's product who triggered the hit. That email shows on the Usage page.
+
+If credits are 0:
+
+```json
+{
+  "ok": false,
+  "error": "INSUFFICIENT_CREDITS",
+  "message": "No credits remaining. Purchase a credit pack to continue.",
+  "credits": 0,
+  "hasCredits": false
+}
+```
+
+HTTP status is `402`.
+
+Deduction is atomic (`credits >= 1` in the same update) so two parallel hits cannot go below zero.
+
+## Stack
+
+Next.js (App Router) + MongoDB (Mongoose). The whole admin portal, auth, and internal APIs live in one Next.js app.
