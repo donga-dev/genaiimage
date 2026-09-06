@@ -165,6 +165,7 @@ export function sanitizeChatOutput(text: string) {
   }
   return next
     .replace(/lum_[A-Za-z0-9_-]{12,}/g, "[redacted]")
+    .replace(/gai_[A-Za-z0-9_-]{12,}/g, "[redacted]")
     .replace(/gsk_[A-Za-z0-9]+/g, "[redacted]")
     .replace(/rzp_(live|test)_[A-Za-z0-9]+/g, "[redacted]")
     .replace(/mongodb(\+srv)?:\/\/\S+/gi, "[redacted]");

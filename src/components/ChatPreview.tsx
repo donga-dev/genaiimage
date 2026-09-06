@@ -3,16 +3,16 @@ export function ChatPreview() {
     <div className="panel overflow-hidden rounded-[28px]">
       <div className="flex items-center gap-2 border-b border-line px-4 py-3">
         <span className="h-2 w-2 rounded-full bg-[#34d399] shadow-[0_0_10px_#34d399]" />
-        <p className="text-sm text-muted">Lumina · workspace chat</p>
+        <p className="text-sm text-muted">GenAI Img · workspace chat</p>
       </div>
       <div className="space-y-4 p-5 text-sm leading-6">
-        <Bubble who="Lumina" tone="ai">
+        <Bubble who="GenAI Img" tone="ai">
           Hi. I can help with credits, packs, or a support ticket.
         </Bubble>
         <Bubble who="You" tone="user">
           Write a 4-line product note and keep the tone confident.
         </Bubble>
-        <Bubble who="Lumina" tone="ai">
+        <Bubble who="GenAI Img" tone="ai">
           Done. Saved to your workspace. This action used 1 credit — 47 remaining.
         </Bubble>
       </div>

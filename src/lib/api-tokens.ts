@@ -6,7 +6,7 @@ export function hashApiToken(token: string) {
 }
 
 export function createApiTokenValue() {
-  const token = `lum_${randomBytes(24).toString("base64url")}`;
+  const token = `gai_${randomBytes(24).toString("base64url")}`;
   return {
     token,
     tokenHash: hashApiToken(token),

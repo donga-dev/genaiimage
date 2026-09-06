@@ -3,7 +3,7 @@
 import Link from "next/link";
 
 function formatLine(line: string) {
-  const parts = line.split(/(\*\*[^*]+\*\*|LU-[A-Z0-9-]+)/g);
+  const parts = line.split(/(\*\*[^*]+\*\*|(?:GI|LU)-[A-Z0-9-]+)/g);
   return parts.map((part, index) => {
     if (part.startsWith("**") && part.endsWith("**")) {
       return (
@@ -12,7 +12,7 @@ function formatLine(line: string) {
         </strong>
       );
     }
-    if (part.startsWith("LU-")) {
+    if (part.startsWith("GI-") || part.startsWith("LU-")) {
       return (
         <span key={index} className="font-mono text-brass">
           {part}
@@ -47,7 +47,7 @@ export function TicketCard({ code }: { code: string }) {
 
 export function ChatMessageBody({ content, ticketCode }: { content: string; ticketCode?: string }) {
   const lines = content.replace(/\r/g, "").split("\n").filter((line) => line.trim().length > 0);
-  const code = ticketCode ?? content.match(/LU-[A-Z0-9-]+/)?.[0];
+  const code = ticketCode ?? content.match(/(?:GI|LU)-[A-Z0-9-]+/)?.[0];
 
   return (
     <div className="space-y-2.5 text-[15px] leading-7 text-text/92">

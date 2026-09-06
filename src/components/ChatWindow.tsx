@@ -15,7 +15,7 @@ type ChatMessage = {
 
 type Chip = { label: string; send?: string; href?: string };
 
-const STORAGE_KEY = "lumina-support-chat";
+const STORAGE_KEY = "genaiimg-support-chat";
 
 const SUGGESTIONS = [
   "How do I buy credits?",
@@ -258,7 +258,7 @@ export function ChatWindow({ firstName = "", credits = 0 }: { firstName?: string
             ) : (
               <div key={message.id} className="chat-in flex gap-3">
                 <span className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[linear-gradient(135deg,#4ea1ff,#8b7cff)] text-[11px] font-semibold text-white">
-                  L
+                  G
                 </span>
                 <div className="group max-w-[min(46rem,90%)]">
                   <div className="rounded-[22px] rounded-tl-md border border-white/8 bg-white/4 px-5 py-4">
@@ -278,7 +278,7 @@ export function ChatWindow({ firstName = "", credits = 0 }: { firstName?: string
         {pending ? (
           <div className="chat-in flex items-center gap-3 text-sm text-muted">
             <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[linear-gradient(135deg,#4ea1ff,#8b7cff)] text-[11px] font-semibold text-white">
-              L
+              G
             </span>
             <span className="flex gap-1">
               <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-brass [animation-delay:-0.2s]" />

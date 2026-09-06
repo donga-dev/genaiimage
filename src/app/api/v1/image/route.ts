@@ -39,8 +39,8 @@ function upstreamHeaders(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   const token = readRequestApiToken(request);
-  if (!token.startsWith("lum_")) {
-    return json({ ok: false, error: "UNAUTHORIZED", message: "Send your Lumina API key as Bearer or x-api-key." }, 401);
+  if (!token.startsWith("gai_") && !token.startsWith("lum_")) {
+    return json({ ok: false, error: "UNAUTHORIZED", message: "Send your GenAI Img API key as Bearer or x-api-key." }, 401);
   }
 
   const upstreamUrl = process.env.UPSTREAM_IMAGE_API_URL?.trim();
