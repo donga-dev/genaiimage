@@ -59,7 +59,7 @@ export function ProfileForm({ admin }: { admin: PublicAdmin }) {
       </label>
       {error ? <p className="text-sm text-danger">{error}</p> : null}
       {message ? <p className="text-sm text-ok">{message}</p> : null}
-      <button type="submit" disabled={pending} className="btn btn-primary">
+      <button type="submit" disabled={pending} className="btn btn-primary w-full">
         {pending ? "Saving…" : "Save changes"}
       </button>
     </form>

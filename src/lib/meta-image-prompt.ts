@@ -1,5 +1,7 @@
 export const META_IMAGE_MODEL = "muse-image-1.0";
 
+// Unused while POST /api/v1/image reads prompt from the request body.
+// Restore META_IMAGE_PROMPT in the route to lock it on the server again.
 export const META_IMAGE_PROMPT = `DETERMINISTIC MODE - 100% REPRODUCIBILITY LOCK: This is 100% deterministic non-generative technical tracing with ZERO creativity, ZERO variation. Same image + same prompt = 100% pixel-identical output every time, any account, anywhere. Temperature=0, seed=fixed, no randomness. Every stroke must be traced from source, 0.01% outside-prompt addition invalid.
 
 STEP 0 - AUTO-DETECT & CLEAN: Detect if source is Type A (black ink on white paper) or Type B (white ink on black paper - inverted). Remove 100%: watermark bar (shutterstock text bar at bottom/top), paper texture, background, shadows, JPEG artifacts, grid lines. Crop edge-to-edge to artwork only, correct perspective/skew, fill background with solid #0A1931 navy. If Type B inverted, treat white as artwork.

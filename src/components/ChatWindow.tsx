@@ -189,20 +189,21 @@ export function ChatWindow({ firstName = "", credits = 0 }: { firstName?: string
   }
 
   return (
-    <div className="gradient-border flex h-[calc(100dvh-5.75rem)] min-h-[calc(100dvh-5.75rem)] w-full flex-col overflow-hidden rounded-[28px] md:rounded-[32px]">
-      <header className="flex items-center justify-between border-b border-white/8 px-5 py-4 md:px-7">
+    <div className="gradient-border flex min-h-0 flex-1 flex-col overflow-hidden rounded-[22px] md:rounded-[32px]">
+      <header className="flex items-center justify-between gap-3 border-b border-white/8 px-4 py-3 md:px-7 md:py-4">
         <div className="flex items-center gap-3">
           <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[conic-gradient(from_210deg,#4ea1ff,#8b7cff,#f472b6,#fb923c,#4ea1ff)] shadow-[0_0_24px_rgba(139,124,255,0.35)]">
             <span className="h-2.5 w-2.5 rounded-full bg-white" />
           </span>
           <div>
             <p className="text-sm font-semibold">{BRAND.name} Support</p>
-            <p className="flex items-center gap-1.5 text-xs text-muted">
+            <p className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-xs text-muted">
               <span className="relative flex h-1.5 w-1.5">
                 <span className="absolute inset-0 animate-ping rounded-full bg-ok opacity-70" />
                 <span className="relative h-1.5 w-1.5 rounded-full bg-ok" />
               </span>
-              Online · chat is free · {credits} credits on hand
+              <span>Online · free chat</span>
+              <span className="hidden sm:inline">· {credits} credits on hand</span>
             </p>
           </div>
         </div>
@@ -226,7 +227,7 @@ export function ChatWindow({ firstName = "", credits = 0 }: { firstName?: string
         {messages.length === 0 ? (
           <div className="flex h-full flex-col items-center justify-center text-center">
             <p className="text-sm uppercase tracking-[0.18em] text-brass">{greeting(firstName)}</p>
-            <p className="serif mt-3 text-4xl md:text-6xl gradient-text">How can I help?</p>
+            <p className="serif mt-3 text-3xl md:text-6xl gradient-text">How can I help?</p>
             <p className="mt-4 max-w-xl text-base leading-7 text-muted">
               Credits, packs, activity, billing, or a support ticket — ask in your own words. This chat
               never spends a credit.
@@ -319,7 +320,7 @@ export function ChatWindow({ firstName = "", credits = 0 }: { firstName?: string
           event.preventDefault();
           void sendText(input);
         }}
-        className="border-t border-white/8 px-4 py-4 md:px-8 md:py-5"
+        className="border-t border-white/8 px-3 py-3 md:px-8 md:py-5"
       >
         {error ? (
           <div className="mb-3 flex flex-wrap items-center gap-3 text-sm text-danger">
@@ -353,11 +354,11 @@ export function ChatWindow({ firstName = "", credits = 0 }: { firstName?: string
             maxLength={4000}
             disabled={pending}
           />
-          <button type="submit" disabled={pending || !input.trim()} className="btn btn-primary h-11 min-w-11 px-4" aria-label="Send">
+          <button type="submit" disabled={pending || !input.trim()} className="btn btn-primary h-11 min-w-11 px-3 sm:px-4" aria-label="Send">
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
               <path d="M2.4 8.4 13.2 2.8 8.1 13.7l-.9-4.4-4.8-.9Z" fill="currentColor" />
             </svg>
-            Send
+            <span className="hidden sm:inline">Send</span>
           </button>
         </div>
         <p className="mt-2 text-center text-[11px] text-muted">

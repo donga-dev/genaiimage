@@ -6,7 +6,7 @@ export function UsageChart({
   const max = Math.max(1, ...data.map((item) => item.hits));
 
   return (
-    <div className="flex h-44 items-end gap-1.5">
+    <div className="flex h-40 items-end gap-1 sm:h-44 sm:gap-1.5">
       {data.map((item) => {
         const height = Math.max(item.hits === 0 ? 6 : (item.hits / max) * 100, 6);
         return (

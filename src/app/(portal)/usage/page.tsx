@@ -24,16 +24,16 @@ export default async function UsagePage({ searchParams }: { searchParams: Search
   if (params.q) query.set("q", params.q);
 
   return (
-    <div className="mx-auto max-w-6xl space-y-8">
+    <div className="mx-auto max-w-6xl space-y-6 md:space-y-8">
       <div>
-        <p className="text-sm uppercase tracking-[0.18em] text-brass">Activity</p>
-        <h1 className="serif mt-2 text-4xl gradient-text">Image generate</h1>
-        <p className="mt-2 text-muted">
+        <p className="text-xs uppercase tracking-[0.18em] text-brass sm:text-sm">Activity</p>
+        <h1 className="serif mt-2 text-3xl gradient-text md:text-4xl">Image generate</h1>
+        <p className="mt-2 text-sm leading-6 text-muted md:text-base">
           Each image generate stores the user email, the time, and credits left.
         </p>
       </div>
 
-      <form className="panel grid gap-3 rounded-3xl p-5 md:grid-cols-[1fr_1fr_1.4fr_auto]">
+      <form className="panel grid gap-3 rounded-[22px] p-4 md:grid-cols-[1fr_1fr_1.4fr_auto] md:rounded-3xl md:p-5">
         <label className="block">
           <span className="mb-1.5 block text-xs uppercase tracking-[0.14em] text-muted">From</span>
           <input className="input" type="date" name="from" defaultValue={params.from} />
@@ -53,39 +53,52 @@ export default async function UsagePage({ searchParams }: { searchParams: Search
         </div>
       </form>
 
-      <section className="panel rounded-[28px] p-6">
+      <section className="panel rounded-[22px] p-4 md:rounded-[28px] md:p-6">
         <p className="mb-4 text-sm text-muted">{data.total} records</p>
         {data.items.length === 0 ? (
           <p className="text-sm text-muted">No image generate matches these filters.</p>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[720px] text-left text-sm">
-              <thead className="text-muted">
-                <tr>
-                  <th className="pb-3 font-medium">Date</th>
-                  <th className="pb-3 font-medium">Used by</th>
-                  <th className="pb-3 font-medium">Credits used</th>
-                  <th className="pb-3 font-medium">Remaining</th>
-                  <th className="pb-3 font-medium">Feature</th>
-                </tr>
-              </thead>
-              <tbody>
-                {data.items.map((row) => (
-                  <tr key={row.id} className="border-t border-line">
-                    <td className="py-3">{formatDate(row.createdAt, true)}</td>
-                    <td className="py-3">{row.userEmail}</td>
-                    <td className="py-3">{row.creditsUsed}</td>
-                    <td className="py-3">{row.remainingCredits}</td>
-                    <td className="py-3 text-muted">{row.source ?? "—"}</td>
+          <>
+            <div className="space-y-3 md:hidden">
+              {data.items.map((row) => (
+                <article key={row.id} className="rounded-2xl border border-line bg-white/4 p-4">
+                  <p className="break-all text-sm font-medium">{row.userEmail}</p>
+                  <p className="mt-1 text-xs text-muted">{formatDate(row.createdAt, true)}</p>
+                  <p className="mt-2 text-sm text-muted">
+                    Used {row.creditsUsed} · {row.remainingCredits} left · {row.source ?? "image"}
+                  </p>
+                </article>
+              ))}
+            </div>
+            <div className="hidden overflow-x-auto md:block">
+              <table className="w-full min-w-[720px] text-left text-sm">
+                <thead className="text-muted">
+                  <tr>
+                    <th className="pb-3 font-medium">Date</th>
+                    <th className="pb-3 font-medium">Used by</th>
+                    <th className="pb-3 font-medium">Credits used</th>
+                    <th className="pb-3 font-medium">Remaining</th>
+                    <th className="pb-3 font-medium">Feature</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {data.items.map((row) => (
+                    <tr key={row.id} className="border-t border-line">
+                      <td className="py-3">{formatDate(row.createdAt, true)}</td>
+                      <td className="py-3">{row.userEmail}</td>
+                      <td className="py-3">{row.creditsUsed}</td>
+                      <td className="py-3">{row.remainingCredits}</td>
+                      <td className="py-3 text-muted">{row.source ?? "—"}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
         )}
 
         {data.totalPages > 1 ? (
-          <div className="mt-6 flex gap-3">
+          <div className="mt-6 flex flex-col gap-3 sm:flex-row">
             {page > 1 ? (
               <Link
                 href={`/usage?${new URLSearchParams({ ...Object.fromEntries(query), page: String(page - 1) })}`}

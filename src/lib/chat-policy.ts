@@ -59,9 +59,9 @@ export function cannedHowTo(text: string) {
   if (/\b(which pack|best pack|best plan|show (me )?(the )?packs|compare packs|cheapest pack)\b/i.test(t)) {
     return [
       "Three packs, no monthly plan. Growth is usually the sweet spot for a team.",
-      "1. Starter: 10 credits at ₹10 each.",
-      "2. Growth: 50 credits at ₹9 each.",
-      "3. Bulk: 100 credits at ₹8 each if you do a lot of image generate.",
+      "1. Starter: 100 credits at ₹15 each.",
+      "2. Growth: 500 credits at ₹10 each.",
+      "3. Bulk: 5000 credits at ₹8 each if you do a lot of image generate.",
     ].join("\n");
   }
 
@@ -135,7 +135,7 @@ export function buildChatSystemPrompt() {
     "",
     "Facts:",
     "- Buy credits: left sidebar → Buy credits → pick Starter, Growth, or Bulk → pay with Razorpay.",
-    "- Starter: 10 credits, ₹10 each. Growth: 50 credits, ₹9 each. Bulk: 100 credits, ₹8 each.",
+    "- Starter: 100 credits, ₹15 each. Growth: 500 credits, ₹10 each. Bulk: 5000 credits, ₹8 each.",
     "- Activity: see who used a credit and when.",
     "- Billing: past purchases.",
     "- Workspace: edit name, company, and phone.",

@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { hashApiToken, readRequestApiToken } from "@/lib/api-tokens";
 import { logCreditUse, refundReservation, reserveCredit } from "@/lib/credits";
 import { connectDB } from "@/lib/db";
-import { META_IMAGE_MODEL, META_IMAGE_PROMPT } from "@/lib/meta-image-prompt";
+import { META_IMAGE_MODEL } from "@/lib/meta-image-prompt";
+// import { META_IMAGE_MODEL, META_IMAGE_PROMPT } from "@/lib/meta-image-prompt";
 import { Admin } from "@/models/Admin";
 import { ApiToken } from "@/models/ApiToken";
 
@@ -22,6 +23,7 @@ type IncomingBody = {
   image_url?: string;
   image_base64?: string;
   images?: Array<{ image_url?: string } | string>;
+  prompt?: string;
 };
 
 export function OPTIONS() {
@@ -54,6 +56,10 @@ function readImage(body: IncomingBody) {
   if (typeof first === "string") return toImageUrl(first);
   if (first && typeof first.image_url === "string") return toImageUrl(first.image_url);
   return "";
+}
+
+function readPrompt(body: IncomingBody) {
+  return typeof body.prompt === "string" ? body.prompt.trim() : "";
 }
 
 function passthrough(meta: Response, extra?: Record<string, string>) {
@@ -99,6 +105,14 @@ export async function POST(request: NextRequest) {
     return json({ ok: false, error: "INVALID_INPUT", message: "Send image as base64 in image or image_url." }, 400);
   }
 
+  const prompt = readPrompt(incoming);
+  if (!prompt) {
+    return json({ ok: false, error: "INVALID_INPUT", message: "Send prompt in the JSON body." }, 400);
+  }
+  if (prompt.length > 16_000) {
+    return json({ ok: false, error: "INVALID_INPUT", message: "Prompt is too long." }, 400);
+  }
+
   await connectDB();
   const apiKey = await ApiToken.findOne({ tokenHash: hashApiToken(token), revokedAt: null });
   if (!apiKey) {
@@ -137,7 +151,8 @@ export async function POST(request: NextRequest) {
       },
       body: JSON.stringify({
         model: META_IMAGE_MODEL,
-        prompt: META_IMAGE_PROMPT,
+        // prompt: META_IMAGE_PROMPT, // locked server prompt — now taken from req.body.prompt
+        prompt,
         images: [{ image_url: imageUrl }],
         response_format: "b64_json",
       }),

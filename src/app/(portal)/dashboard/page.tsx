@@ -12,29 +12,29 @@ export default async function DashboardPage() {
   const data = await getDashboardData(admin.id);
 
   return (
-    <div className="mx-auto max-w-6xl space-y-8">
+    <div className="mx-auto max-w-6xl space-y-6 md:space-y-8">
       <div>
-        <p className="text-sm uppercase tracking-[0.18em] text-brass">{BRAND.tagline}</p>
-        <h1 className="serif mt-2 text-4xl">
+        <p className="text-xs uppercase tracking-[0.18em] text-brass sm:text-sm">{BRAND.tagline}</p>
+        <h1 className="serif mt-2 text-3xl md:text-4xl">
           Welcome back, <span className="gradient-text">{admin.name.split(" ")[0]}</span>
         </h1>
-        <p className="mt-2 text-muted">
+        <p className="mt-2 text-sm leading-6 text-muted md:text-base">
           {admin.companyName} · Buy credits here. Each image generate uses one.
         </p>
       </div>
 
-      <section className="gradient-border overflow-hidden rounded-[28px] p-6 md:p-8">
-        <div className="flex flex-wrap items-end justify-between gap-6">
+      <section className="gradient-border overflow-hidden rounded-[22px] p-5 md:rounded-[28px] md:p-8">
+        <div className="flex flex-col gap-5 sm:flex-row sm:flex-wrap sm:items-end sm:justify-between">
           <div>
             <p className="text-sm text-muted">AI credits remaining</p>
-            <p className="serif mt-2 text-6xl gradient-text">{admin.credits}</p>
+            <p className="serif mt-2 text-5xl gradient-text md:text-6xl">{admin.credits}</p>
             <p className="mt-3 text-sm text-muted">
               {admin.credits === 0
                 ? "Your workspace is out of credits. Buy a pack to keep image generate running."
                 : "Each image generate uses 1 credit."}
             </p>
           </div>
-          <Link href="/plans" className="btn btn-primary">
+          <Link href="/plans" className="btn btn-primary w-full sm:w-auto">
             Buy credits
           </Link>
         </div>
@@ -60,48 +60,61 @@ export default async function DashboardPage() {
         <HowStep step="03" title="Track everything" text="See who used it, when, and how many credits remain." />
       </section>
 
-      <section className="panel rounded-[28px] p-6">
-        <div className="mb-6 flex items-center justify-between">
+      <section className="panel rounded-[22px] p-4 md:rounded-[28px] md:p-6">
+        <div className="mb-5 flex items-center justify-between gap-3 md:mb-6">
           <div>
-            <h2 className="serif text-2xl">Last 14 days</h2>
+            <h2 className="serif text-xl md:text-2xl">Last 14 days</h2>
             <p className="text-sm text-muted">Image generate billed to this workspace</p>
           </div>
-          <Link href="/usage" className="text-sm text-brass hover:underline">
+          <Link href="/usage" className="shrink-0 text-sm text-brass hover:underline">
             Open activity
           </Link>
         </div>
         <UsageChart data={data.chart} />
       </section>
 
-      <section className="panel rounded-[28px] p-6">
-        <h2 className="serif text-2xl">Recent activity</h2>
+      <section className="panel rounded-[22px] p-4 md:rounded-[28px] md:p-6">
+        <h2 className="serif text-xl md:text-2xl">Recent activity</h2>
         {data.recentUsage.length === 0 ? (
           <p className="mt-4 text-sm text-muted">
             No image generate yet. When someone uses your product, their email will appear here.
           </p>
         ) : (
-          <div className="mt-4 overflow-x-auto">
-            <table className="w-full min-w-[640px] text-left text-sm">
-              <thead className="text-muted">
-                <tr>
-                  <th className="pb-3 font-medium">When</th>
-                  <th className="pb-3 font-medium">Used by</th>
-                  <th className="pb-3 font-medium">Feature</th>
-                  <th className="pb-3 font-medium">Left after</th>
-                </tr>
-              </thead>
-              <tbody>
-                {data.recentUsage.map((row) => (
-                  <tr key={row.id} className="border-t border-line">
-                    <td className="py-3">{formatDate(row.createdAt, true)}</td>
-                    <td className="py-3">{row.userEmail}</td>
-                    <td className="py-3 text-muted">{row.source ?? "—"}</td>
-                    <td className="py-3">{row.remainingCredits}</td>
+          <>
+            <div className="mt-4 space-y-3 md:hidden">
+              {data.recentUsage.map((row) => (
+                <article key={row.id} className="rounded-2xl border border-line bg-white/4 p-4">
+                  <p className="break-all text-sm font-medium">{row.userEmail}</p>
+                  <p className="mt-1 text-xs text-muted">{formatDate(row.createdAt, true)}</p>
+                  <p className="mt-2 text-sm text-muted">
+                    {row.source ?? "image"} · {row.remainingCredits} left
+                  </p>
+                </article>
+              ))}
+            </div>
+            <div className="mt-4 hidden overflow-x-auto md:block">
+              <table className="w-full min-w-[640px] text-left text-sm">
+                <thead className="text-muted">
+                  <tr>
+                    <th className="pb-3 font-medium">When</th>
+                    <th className="pb-3 font-medium">Used by</th>
+                    <th className="pb-3 font-medium">Feature</th>
+                    <th className="pb-3 font-medium">Left after</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {data.recentUsage.map((row) => (
+                    <tr key={row.id} className="border-t border-line">
+                      <td className="py-3">{formatDate(row.createdAt, true)}</td>
+                      <td className="py-3">{row.userEmail}</td>
+                      <td className="py-3 text-muted">{row.source ?? "—"}</td>
+                      <td className="py-3">{row.remainingCredits}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
         )}
       </section>
     </div>

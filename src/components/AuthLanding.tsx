@@ -14,13 +14,13 @@ export function AuthLanding({
   children: React.ReactNode;
 }) {
   return (
-    <div className="relative min-h-screen">
-      <header className="relative z-10 flex items-center justify-between px-6 py-5 lg:px-12">
+    <div className="relative min-h-dvh">
+      <header className="relative z-10 flex items-center justify-between px-4 py-4 pt-[max(1rem,env(safe-area-inset-top))] sm:px-6 lg:px-12">
         <Logo />
         <p className="hidden text-sm text-muted sm:block">Buy AI credits in one workspace</p>
       </header>
 
-      <div className="relative z-10 mx-auto grid min-h-[calc(100vh-88px)] max-w-7xl items-center gap-12 px-6 pb-16 lg:grid-cols-[1.15fr_0.85fr] lg:px-12">
+      <div className="relative z-10 mx-auto grid min-h-[calc(100dvh-88px)] max-w-7xl items-center gap-10 px-4 pb-12 sm:px-6 lg:grid-cols-[1.15fr_0.85fr] lg:px-12 lg:pb-16">
         <section className="hidden lg:block">
           <p className="text-sm uppercase tracking-[0.22em] text-brass">Image generate</p>
           <h1 className="serif mt-4 max-w-xl text-6xl leading-[1.05]">
@@ -55,12 +55,12 @@ export function AuthLanding({
         <section className="mx-auto w-full max-w-md lg:mx-0 lg:justify-self-end">
           <div className="mb-6 lg:hidden">
             <p className="text-sm uppercase tracking-[0.22em] text-brass">Image generate</p>
-            <h1 className="serif mt-2 text-4xl">
+            <h1 className="serif mt-2 text-3xl">
               <span className="gradient-text">{title}</span>
             </h1>
             <p className="mt-2 text-sm text-muted">{subtitle}</p>
           </div>
-          <div className="panel rounded-[28px] p-7 md:p-8">
+          <div className="panel rounded-[22px] p-5 sm:rounded-[28px] sm:p-7 md:p-8">
             <div className="mb-6 hidden lg:block">
               <h2 className="serif text-3xl">{title}</h2>
               <p className="mt-2 text-sm leading-6 text-muted">{subtitle}</p>
@@ -75,7 +75,7 @@ export function AuthLanding({
         </section>
       </div>
 
-      <section className="relative z-10 border-t border-line px-6 py-10 lg:px-12">
+      <section className="relative z-10 border-t border-line px-4 py-8 pb-[max(2rem,env(safe-area-inset-bottom))] sm:px-6 lg:px-12 lg:py-10">
         <div className="mx-auto grid max-w-7xl gap-4 md:grid-cols-3">
           <Step n="01" title="Create a workspace" text="One account for your company. Invite your product to use it." />
           <Step n="02" title="Buy credit packs" text="Starter, Growth, or Bulk. Larger packs cost less per generation." />

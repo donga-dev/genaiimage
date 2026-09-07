@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Aurora } from "@/components/Aurora";
 import { BRAND } from "@/lib/brand";
@@ -20,10 +20,17 @@ export const metadata: Metadata = {
   applicationName: BRAND.name,
 };
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  themeColor: "#0b0c10",
+};
+
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
-      <body className="relative min-h-full">
+      <body className="relative min-h-full overflow-x-hidden">
         <Aurora />
         <div className="relative z-10 min-h-full">{children}</div>
       </body>

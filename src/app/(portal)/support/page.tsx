@@ -10,20 +10,20 @@ export default async function SupportPage() {
   const tickets = await Ticket.find({ adminId: admin.id }).sort({ createdAt: -1 }).lean();
 
   return (
-    <div className="mx-auto max-w-5xl space-y-8">
+    <div className="mx-auto max-w-5xl space-y-6 md:space-y-8">
       <div>
-        <p className="text-sm uppercase tracking-[0.18em] text-brass">Support</p>
-        <h1 className="serif mt-2 text-4xl gradient-text">Your tickets</h1>
-        <p className="mt-2 text-muted">
+        <p className="text-xs uppercase tracking-[0.18em] text-brass sm:text-sm">Support</p>
+        <h1 className="serif mt-2 text-3xl gradient-text md:text-4xl">Your tickets</h1>
+        <p className="mt-2 text-sm leading-6 text-muted md:text-base">
           Ask Chat to create a ticket when something is stuck, like buying credits. It will appear here
           with a ticket code.
         </p>
-        <Link href="/chat" className="btn btn-primary mt-5 px-4 py-2 text-sm">
+        <Link href="/chat" className="btn btn-primary mt-5 w-full px-4 py-2.5 text-sm sm:w-auto">
           Open Chat
         </Link>
       </div>
 
-      <section className="panel rounded-[28px] p-6">
+      <section className="panel rounded-[22px] p-4 md:rounded-[28px] md:p-6">
         {tickets.length === 0 ? (
           <div className="flex flex-col items-start gap-4">
             <p className="text-sm text-muted">No tickets yet. Open Chat and ask to create a support ticket.</p>
