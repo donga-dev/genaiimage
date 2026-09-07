@@ -154,7 +154,7 @@ function secretValues() {
     process.env.RAZORPAY_KEY_SECRET,
     process.env.RAZORPAY_WEBHOOK_SECRET,
     process.env.MONGODB_URI,
-    process.env.UPSTREAM_IMAGE_API_KEY,
+    process.env.META_API_KEY,
   ].filter((value): value is string => Boolean(value && value.length > 6));
 }
 

@@ -2,15 +2,26 @@ import { NextRequest, NextResponse } from "next/server";
 import { hashApiToken, readRequestApiToken } from "@/lib/api-tokens";
 import { logCreditUse, refundReservation, reserveCredit } from "@/lib/credits";
 import { connectDB } from "@/lib/db";
+import { META_IMAGE_MODEL, META_IMAGE_PROMPT } from "@/lib/meta-image-prompt";
 import { Admin } from "@/models/Admin";
 import { ApiToken } from "@/models/ApiToken";
 
 export const maxDuration = 60;
+export const runtime = "nodejs";
+
+const META_IMAGE_URL = "https://api.meta.ai/v1/images/edits";
 
 const CORS = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "Authorization, Content-Type, x-api-key, x-user-email",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
+};
+
+type IncomingBody = {
+  image?: string;
+  image_url?: string;
+  image_base64?: string;
+  images?: Array<{ image_url?: string } | string>;
 };
 
 export function OPTIONS() {
@@ -26,33 +37,66 @@ function userEmailFrom(request: NextRequest, fallback: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(raw) ? raw : fallback;
 }
 
-function upstreamHeaders(request: NextRequest) {
-  const headers = new Headers();
-  const contentType = request.headers.get("content-type");
+function toImageUrl(value: string) {
+  const trimmed = value.trim();
+  if (!trimmed) return "";
+  if (trimmed.startsWith("data:") || trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
+    return trimmed;
+  }
+  return `data:image/png;base64,${trimmed}`;
+}
+
+function readImage(body: IncomingBody) {
+  if (typeof body.image === "string") return toImageUrl(body.image);
+  if (typeof body.image_url === "string") return toImageUrl(body.image_url);
+  if (typeof body.image_base64 === "string") return toImageUrl(body.image_base64);
+  const first = body.images?.[0];
+  if (typeof first === "string") return toImageUrl(first);
+  if (first && typeof first.image_url === "string") return toImageUrl(first.image_url);
+  return "";
+}
+
+function passthrough(meta: Response, extra?: Record<string, string>) {
+  const headers = new Headers(CORS);
+  const contentType = meta.headers.get("content-type");
   if (contentType) headers.set("content-type", contentType);
-
-  const upstreamKey = process.env.UPSTREAM_IMAGE_API_KEY?.trim();
-  if (upstreamKey) headers.set("authorization", `Bearer ${upstreamKey}`);
-
+  if (extra) {
+    for (const [key, value] of Object.entries(extra)) headers.set(key, value);
+  }
   return headers;
 }
 
 export async function POST(request: NextRequest) {
   const token = readRequestApiToken(request);
   if (!token.startsWith("gai_") && !token.startsWith("lum_")) {
-    return json({ ok: false, error: "UNAUTHORIZED", message: "Send your GenAI Img API key as Bearer or x-api-key." }, 401);
+    return json(
+      { ok: false, error: "UNAUTHORIZED", message: "Send your GenAI Img API key as Bearer or x-api-key." },
+      401,
+    );
   }
 
-  const upstreamUrl = process.env.UPSTREAM_IMAGE_API_URL?.trim();
-  if (!upstreamUrl) {
+  const metaKey = process.env.META_API_KEY?.trim();
+  if (!metaKey) {
     return json(
       {
         ok: false,
-        error: "UPSTREAM_NOT_CONFIGURED",
-        message: "Add UPSTREAM_IMAGE_API_URL to .env.local, then restart the server.",
+        error: "META_NOT_CONFIGURED",
+        message: "Add META_API_KEY to the server env, then restart.",
       },
       503,
     );
+  }
+
+  let incoming: IncomingBody;
+  try {
+    incoming = (await request.json()) as IncomingBody;
+  } catch {
+    return json({ ok: false, error: "INVALID_INPUT", message: "JSON body is required." }, 400);
+  }
+
+  const imageUrl = readImage(incoming);
+  if (!imageUrl) {
+    return json({ ok: false, error: "INVALID_INPUT", message: "Send image as base64 in image or image_url." }, 400);
   }
 
   await connectDB();
@@ -83,33 +127,34 @@ export async function POST(request: NextRequest) {
     return json({ ok: false, error: "ADMIN_NOT_FOUND", message: "Workspace not found" }, 404);
   }
 
-  let upstream: Response;
+  let meta: Response;
   try {
-    const target = new URL(upstreamUrl);
-    request.nextUrl.searchParams.forEach((value, key) => {
-      if (!target.searchParams.has(key)) target.searchParams.set(key, value);
-    });
-
-    const payload = await request.arrayBuffer();
-    upstream = await fetch(target, {
+    meta = await fetch(META_IMAGE_URL, {
       method: "POST",
-      headers: upstreamHeaders(request),
-      body: payload.byteLength ? payload : undefined,
+      headers: {
+        Authorization: `Bearer ${metaKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: META_IMAGE_MODEL,
+        prompt: META_IMAGE_PROMPT,
+        images: [{ image_url: imageUrl }],
+        response_format: "b64_json",
+      }),
       signal: AbortSignal.timeout(55_000),
     });
   } catch (error) {
     await refundReservation(admin._id.toString());
-    console.error("upstream image call failed", error);
-    return json({ ok: false, error: "UPSTREAM_ERROR", message: "Image API did not respond." }, 502);
+    console.error("meta image call failed", error);
+    return json({ ok: false, error: "META_ERROR", message: "Image API did not respond." }, 502);
   }
 
-  if (!upstream.ok) {
+  if (!meta.ok) {
     await refundReservation(admin._id.toString());
-    const failBody = await upstream.arrayBuffer();
-    const headers = new Headers(CORS);
-    const contentType = upstream.headers.get("content-type");
-    if (contentType) headers.set("content-type", contentType);
-    return new NextResponse(failBody, { status: upstream.status, headers });
+    return new NextResponse(await meta.arrayBuffer(), {
+      status: meta.status,
+      headers: passthrough(meta),
+    });
   }
 
   await ApiToken.findByIdAndUpdate(apiKey._id, { lastUsedAt: new Date() });
@@ -121,10 +166,8 @@ export async function POST(request: NextRequest) {
     source: "image",
   });
 
-  const body = await upstream.arrayBuffer();
-  const headers = new Headers(CORS);
-  const contentType = upstream.headers.get("content-type");
-  if (contentType) headers.set("content-type", contentType);
-  headers.set("x-credits-remaining", String(reserved.credits));
-  return new NextResponse(body, { status: 200, headers });
+  return new NextResponse(await meta.arrayBuffer(), {
+    status: 200,
+    headers: passthrough(meta, { "x-credits-remaining": String(reserved.credits) }),
+  });
 }
