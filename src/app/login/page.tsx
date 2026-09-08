@@ -6,6 +6,7 @@ import { BRAND } from "@/lib/brand";
 export default function LoginPage() {
   return (
     <AuthLanding
+      nav="login"
       title="Welcome back"
       subtitle={`Sign in to ${BRAND.name} and buy credits for image generate.`}
     >

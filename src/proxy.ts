@@ -3,6 +3,7 @@ import type { NextRequest } from "next/server";
 import { SESSION_COOKIE, verifySession } from "@/lib/session";
 
 const AUTH_PAGES = new Set(["/login", "/signup"]);
+const PUBLIC_PAGES = new Set(["/docs"]);
 
 function isPublicApi(pathname: string) {
   return (
@@ -42,6 +43,10 @@ export async function proxy(request: NextRequest) {
     if (session) {
       return NextResponse.redirect(new URL("/dashboard", request.url));
     }
+    return NextResponse.next();
+  }
+
+  if (PUBLIC_PAGES.has(pathname)) {
     return NextResponse.next();
   }
 

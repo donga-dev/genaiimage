@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { ApiKeysPanel } from "@/components/ApiKeysPanel";
 import { requireAdmin } from "@/lib/auth";
 import { serializeApiToken } from "@/lib/api-tokens";
@@ -15,7 +16,11 @@ export default async function ApiKeysPage() {
         <p className="text-xs uppercase tracking-[0.18em] text-brass sm:text-sm">API keys</p>
         <h1 className="serif mt-2 text-3xl gradient-text md:text-4xl">Your keys</h1>
         <p className="mt-2 max-w-2xl text-sm leading-6 text-muted md:text-base">
-          Generate a key, copy it once, and paste it in your product. That is all this page is for.
+          Generate a key, copy it once, and paste it in your product. Endpoints are on{" "}
+          <Link href="/docs" className="text-brass hover:underline">
+            API docs
+          </Link>
+          .
         </p>
       </div>
 

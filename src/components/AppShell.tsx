@@ -15,6 +15,7 @@ const links = [
   { href: "/usage", label: "Activity" },
   { href: "/purchases", label: "Billing" },
   { href: "/support", label: "Support" },
+  { href: "/docs", label: "API docs" },
   { href: "/keys", label: "API keys" },
   { href: "/profile", label: "Workspace" },
 ];

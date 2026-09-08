@@ -1,5 +1,5 @@
-import { Logo } from "@/components/Logo";
 import { ChatPreview } from "@/components/ChatPreview";
+import { PublicHeader } from "@/components/PublicHeader";
 import { BRAND } from "@/lib/brand";
 
 const capabilities = ["Image generate"];
@@ -8,17 +8,16 @@ export function AuthLanding({
   title,
   subtitle,
   children,
+  nav,
 }: {
   title: string;
   subtitle: string;
   children: React.ReactNode;
+  nav?: "login" | "signup";
 }) {
   return (
     <div className="relative min-h-dvh">
-      <header className="relative z-10 flex items-center justify-between px-4 py-4 pt-[max(1rem,env(safe-area-inset-top))] sm:px-6 lg:px-12">
-        <Logo />
-        <p className="hidden text-sm text-muted sm:block">Buy AI credits in one workspace</p>
-      </header>
+      <PublicHeader active={nav} />
 
       <div className="relative z-10 mx-auto grid min-h-[calc(100dvh-88px)] max-w-7xl items-center gap-10 px-4 pb-12 sm:px-6 lg:grid-cols-[1.15fr_0.85fr] lg:px-12 lg:pb-16">
         <section className="hidden lg:block">

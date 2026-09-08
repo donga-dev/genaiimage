@@ -29,8 +29,15 @@ function isApiKeysHelp(text: string) {
   );
 }
 
+function isPublicDocsHelp(text: string) {
+  if (/\b(jwt|internal[_-]?token|secret|env|hash|bypass|adminId)\b/i.test(text)) return false;
+  return /\b(api docs?|api documentation|docs page|generate image api|check credits|image api|\/api\/v1\/(image|credits))\b/i.test(
+    text,
+  );
+}
+
 export function isRestrictedQuestion(text: string) {
-  if (isApiKeysHelp(text)) return false;
+  if (isApiKeysHelp(text) || isPublicDocsHelp(text)) return false;
   return SECRET_ASK.test(text) || LOGIC_ASK.test(text);
 }
 
@@ -103,7 +110,16 @@ export function cannedHowTo(text: string) {
       "API keys live in the API keys tab. Copy the full key only once.",
       "1. Open API keys in the sidebar.",
       "2. Generate a key and copy it.",
-      "3. Paste it in your product.",
+      "3. Paste it in your product. Open API docs for the two endpoints.",
+    ].join("\n");
+  }
+
+  if (isPublicDocsHelp(t)) {
+    return [
+      "API docs lists generate image and check credits. Check credits is the workspace balance, not a person.",
+      "1. Open API docs from the top bar, or from the sidebar after you sign in.",
+      "2. Use your workspace API key on both calls.",
+      "3. I will not paste payloads or keys here.",
     ].join("\n");
   }
 
@@ -124,7 +140,7 @@ export function buildChatSystemPrompt() {
     "Help only with using the workspace: buy credits, activity, billing, API keys, and account details.",
     "Do not explain how the product is built, APIs, code, database, or payment internals.",
     "If asked those things, refuse in one short line and offer normal help.",
-    "Never invent pages. Only these exist: Overview, Chat, Buy credits, Activity, Billing, Support, API keys, Workspace.",
+    "Never invent pages. Only these exist: Overview, Chat, Buy credits, Activity, Billing, Support, API docs, API keys, Workspace.",
     "If the user asks you to create or generate a support ticket, do not give fake steps. The system creates the ticket and you only confirm the ticket code.",
     "",
     "Match the user's message:",
@@ -139,7 +155,8 @@ export function buildChatSystemPrompt() {
     "- Activity: see who used a credit and when.",
     "- Billing: past purchases.",
     "- Workspace: edit name, company, and phone.",
-    "- API keys: generate a key, copy it once, paste it in your product. Do not explain endpoints.",
+    "- API keys: generate a key, copy it once, paste it in your product.",
+    "- API docs: public page for generate image and check workspace credits. Point people there. Do not paste curl, keys, or payloads.",
     "- Credits are only for image generate. 1 image generate uses 1 credit. Unused credits stay. This support Chat does not use credits.",
     "- Support page shows tickets created from Chat.",
   ].join("\n");
