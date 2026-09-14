@@ -62,13 +62,14 @@ export async function POST(request: Request) {
         adminId: admin.id,
         planId: plan._id.toString(),
         planName: plan.name,
+        model: plan.model || "genaiimg-v1",
       },
     });
 
     const purchase = await Purchase.create({
       adminId: admin.id,
       planId: plan._id,
-      planName: plan.name,
+      planName: `${plan.name} · ${plan.model || "genaiimg-v1"}`,
       credits: plan.credits,
       pricePerCredit: plan.pricePerCredit,
       amountPaid: plan.totalPrice,

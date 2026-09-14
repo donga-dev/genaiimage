@@ -65,10 +65,10 @@ export function cannedHowTo(text: string) {
 
   if (/\b(which pack|best pack|best plan|show (me )?(the )?packs|compare packs|cheapest pack)\b/i.test(t)) {
     return [
-      "Three packs, no monthly plan. Growth is usually the sweet spot for a team.",
-      "1. Starter: 100 credits at ₹15 each.",
-      "2. Growth: 500 credits at ₹10 each.",
-      "3. Bulk: 5000 credits at ₹8 each if you do a lot of image generate.",
+      "Two models on Buy credits: genaiimg-v1 and genaiimg-v2. v2 packs cost more.",
+      "1. genaiimg-v1: Starter 100 at ₹15, Growth 500 at ₹10, Bulk 5000 at ₹8.",
+      "2. genaiimg-v2: Starter 100 at ₹25, Growth 500 at ₹18, Bulk 5000 at ₹14.",
+      "3. Pick the model first, then the pack.",
     ].join("\n");
   }
 
@@ -76,7 +76,7 @@ export function cannedHowTo(text: string) {
     return [
       "You buy a one-time pack. Credits land after Razorpay payment.",
       "1. Open Buy credits in the left sidebar.",
-      "2. Pick Starter, Growth, or Bulk.",
+      "2. Pick genaiimg-v1 or genaiimg-v2, then Starter, Growth, or Bulk.",
       "3. Pay with Razorpay. Unused credits stay.",
     ].join("\n");
   }
@@ -150,8 +150,9 @@ export function buildChatSystemPrompt() {
     "Do not write long paragraphs. Do not use markdown headings. Do not say Avatar, Marketplace, Project Settings, Agents, or Search. The product only does image generate. This Chat tab is support only.",
     "",
     "Facts:",
-    "- Buy credits: left sidebar → Buy credits → pick Starter, Growth, or Bulk → pay with Razorpay.",
-    "- Starter: 100 credits, ₹15 each. Growth: 500 credits, ₹10 each. Bulk: 5000 credits, ₹8 each.",
+    "- Buy credits: left sidebar → Buy credits → pick genaiimg-v1 or genaiimg-v2 → pick Starter, Growth, or Bulk → pay with Razorpay.",
+    "- genaiimg-v1: Starter 100 credits ₹15 each. Growth 500 credits ₹10 each. Bulk 5000 credits ₹8 each.",
+    "- genaiimg-v2: Starter 100 credits ₹25 each. Growth 500 credits ₹18 each. Bulk 5000 credits ₹14 each. Dummy prices, higher than v1.",
     "- Activity: see who used a credit and when.",
     "- Billing: past purchases.",
     "- Workspace: edit name, company, and phone.",

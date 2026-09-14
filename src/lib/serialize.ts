@@ -45,6 +45,7 @@ export function serializePlan(plan: LeanPlan): PublicPlan {
     id: plan._id.toString(),
     slug: plan.slug,
     name: plan.name,
+    model: plan.model || "genaiimg-v1",
     description: plan.description,
     credits: plan.credits,
     pricePerCredit: plan.pricePerCredit,

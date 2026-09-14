@@ -44,7 +44,11 @@ export default async function DashboardPage() {
         <Stat
           label="Current pack"
           value={admin.currentPlan?.name ?? "None"}
-          hint={admin.currentPlan ? `₹${admin.currentPlan.pricePerCredit} per credit` : "Choose a credit pack"}
+          hint={
+            admin.currentPlan
+              ? `${admin.currentPlan.model} · ₹${admin.currentPlan.pricePerCredit} per credit`
+              : "Choose a credit pack"
+          }
         />
         <Stat
           label="Last purchase"

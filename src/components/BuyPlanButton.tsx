@@ -70,7 +70,7 @@ export function BuyPlanButton({
         amount: order.amount,
         currency: order.currency ?? "INR",
         name: BRAND.name,
-        description: `${plan.name} · ${plan.credits} AI credits`,
+        description: `${plan.name} · ${plan.model} · ${plan.credits} AI credits`,
         order_id: order.orderId,
         prefill: {
           name: admin.name,
@@ -79,6 +79,7 @@ export function BuyPlanButton({
         },
         notes: {
           plan: plan.slug,
+          model: plan.model,
         },
         theme: { color: "#6d5efc" },
         handler: async (response) => {

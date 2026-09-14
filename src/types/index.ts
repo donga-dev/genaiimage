@@ -14,6 +14,7 @@ export type PublicPlan = {
   id: string;
   slug: string;
   name: string;
+  model: string;
   description: string;
   credits: number;
   pricePerCredit: number;
