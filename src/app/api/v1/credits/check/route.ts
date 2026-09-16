@@ -1,6 +1,7 @@
 import { Types } from "mongoose";
 import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/lib/db";
+import { splitCredits } from "@/lib/image-models";
 import { requireInternalToken } from "@/lib/internal-auth";
 import { creditLookupSchema } from "@/lib/validators";
 import { Admin } from "@/models/Admin";
@@ -36,13 +37,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const credits = admin.credits;
-    const hasCredits = credits > 0;
+    const split = splitCredits(admin);
 
     return NextResponse.json({
       ok: true,
-      hasCredits,
-      credits,
+      hasCredits: split.credits > 0,
+      credits: {
+        "genaiimg-v1": split.creditsV1,
+        "genaiimg-v2": split.creditsV2,
+      },
       adminId: admin._id.toString(),
       adminEmail: admin.email,
     });

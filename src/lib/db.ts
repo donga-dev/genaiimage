@@ -18,28 +18,34 @@ const cache: MongooseCache = globalForMongoose.mongooseCache ?? {
 
 globalForMongoose.mongooseCache = cache;
 
+let creditsMigrated = false;
+
 export async function connectDB() {
   if (!MONGODB_URI) {
     throw new Error("MONGODB_URI is not set");
   }
 
-  if (cache.conn) {
-    return cache.conn;
+  if (!cache.conn) {
+    if (!cache.promise) {
+      cache.promise = mongoose
+        .connect(MONGODB_URI, {
+          bufferCommands: false,
+          serverSelectionTimeoutMS: 8000,
+        })
+        .catch((error) => {
+          cache.promise = null;
+          cache.conn = null;
+          throw error;
+        });
+    }
+    cache.conn = await cache.promise;
   }
 
-  if (!cache.promise) {
-    cache.promise = mongoose
-      .connect(MONGODB_URI, {
-        bufferCommands: false,
-        serverSelectionTimeoutMS: 8000,
-      })
-      .catch((error) => {
-        cache.promise = null;
-        cache.conn = null;
-        throw error;
-      });
+  if (!creditsMigrated) {
+    creditsMigrated = true;
+    const { migrateSplitCredits } = await import("@/lib/credits");
+    await migrateSplitCredits();
   }
 
-  cache.conn = await cache.promise;
   return cache.conn;
 }

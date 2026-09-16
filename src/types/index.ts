@@ -5,6 +5,8 @@ export type PublicAdmin = {
   email: string;
   phone: string;
   credits: number;
+  creditsV1: number;
+  creditsV2: number;
   lastPurchaseDate: string | null;
   currentPlan: PublicPlan | null;
   createdAt: string;
@@ -26,6 +28,7 @@ export type PublicPlan = {
 export type PublicPurchase = {
   id: string;
   planName: string;
+  model: string | null;
   credits: number;
   pricePerCredit: number;
   amountPaid: number;
@@ -41,6 +44,7 @@ export type PublicUsage = {
   creditsUsed: number;
   remainingCredits: number;
   source: string | null;
+  model: string | null;
   createdAt: string;
 };
 

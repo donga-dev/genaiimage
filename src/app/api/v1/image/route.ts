@@ -2,8 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { hashApiToken, readRequestApiToken } from "@/lib/api-tokens";
 import { logCreditUse, refundReservation, reserveCredit } from "@/lib/credits";
 import { connectDB } from "@/lib/db";
+import { readImageModel } from "@/lib/image-models";
 import { META_IMAGE_MODEL } from "@/lib/meta-image-prompt";
-// import { META_IMAGE_MODEL, META_IMAGE_PROMPT } from "@/lib/meta-image-prompt";
+import { editImageWithOpenAI } from "@/lib/openai-image-edit";
 import { Admin } from "@/models/Admin";
 import { ApiToken } from "@/models/ApiToken";
 
@@ -14,7 +15,7 @@ const META_IMAGE_URL = "https://api.meta.ai/v1/images/edits";
 
 const CORS = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "Authorization, Content-Type, x-api-key, x-user-email",
+  "Access-Control-Allow-Headers": "Authorization, Content-Type, x-api-key, x-user-email, x-model, x-version",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
@@ -62,14 +63,31 @@ function readPrompt(body: IncomingBody) {
   return typeof body.prompt === "string" ? body.prompt.trim() : "";
 }
 
-function passthrough(meta: Response, extra?: Record<string, string>) {
+function passthrough(upstream: Response, extra?: Record<string, string>) {
   const headers = new Headers(CORS);
-  const contentType = meta.headers.get("content-type");
+  const contentType = upstream.headers.get("content-type");
   if (contentType) headers.set("content-type", contentType);
   if (extra) {
     for (const [key, value] of Object.entries(extra)) headers.set(key, value);
   }
   return headers;
+}
+
+async function callMeta(imageUrl: string, prompt: string, metaKey: string) {
+  return fetch(META_IMAGE_URL, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${metaKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      model: META_IMAGE_MODEL,
+      prompt,
+      images: [{ image_url: imageUrl }],
+      response_format: "b64_json",
+    }),
+    signal: AbortSignal.timeout(55_000),
+  });
 }
 
 export async function POST(request: NextRequest) {
@@ -81,13 +99,35 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const metaKey = process.env.META_API_KEY?.trim();
-  if (!metaKey) {
+  const model = readImageModel(request);
+  if (!model) {
+    return json(
+      {
+        ok: false,
+        error: "INVALID_INPUT",
+        message: "Send x-model as genaiimg-v1 or genaiimg-v2.",
+      },
+      400,
+    );
+  }
+
+  if (model === "genaiimg-v1" && !process.env.META_API_KEY?.trim()) {
     return json(
       {
         ok: false,
         error: "META_NOT_CONFIGURED",
         message: "Add META_API_KEY to the server env, then restart.",
+      },
+      503,
+    );
+  }
+
+  if (model === "genaiimg-v2" && !process.env.OPENAI_API_KEY?.trim()) {
+    return json(
+      {
+        ok: false,
+        error: "OPENAI_NOT_CONFIGURED",
+        message: "Add OPENAI_API_KEY to the server env, then restart.",
       },
       503,
     );
@@ -124,14 +164,15 @@ export async function POST(request: NextRequest) {
     return json({ ok: false, error: "ADMIN_NOT_FOUND", message: "Workspace not found" }, 404);
   }
 
-  const reserved = await reserveCredit(admin._id.toString(), admin.email);
+  const reserved = await reserveCredit(admin._id.toString(), admin.email, model);
   if (!reserved.ok) {
     if (reserved.reason === "no_credits") {
       return json(
         {
           ok: false,
           error: "INSUFFICIENT_CREDITS",
-          message: "No credits remaining. Purchase a credit pack to continue.",
+          message: `No ${model} credits remaining. Buy a ${model} pack to continue.`,
+          model,
           credits: 0,
           hasCredits: false,
         },
@@ -141,34 +182,27 @@ export async function POST(request: NextRequest) {
     return json({ ok: false, error: "ADMIN_NOT_FOUND", message: "Workspace not found" }, 404);
   }
 
-  let meta: Response;
+  let upstream: Response;
   try {
-    meta = await fetch(META_IMAGE_URL, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${metaKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: META_IMAGE_MODEL,
-        // prompt: META_IMAGE_PROMPT, // locked server prompt — now taken from req.body.prompt
-        prompt,
-        images: [{ image_url: imageUrl }],
-        response_format: "b64_json",
-      }),
-      signal: AbortSignal.timeout(55_000),
-    });
+    upstream =
+      model === "genaiimg-v2"
+        ? await editImageWithOpenAI({
+            imageUrl,
+            prompt,
+            apiKey: process.env.OPENAI_API_KEY!.trim(),
+          })
+        : await callMeta(imageUrl, prompt, process.env.META_API_KEY!.trim());
   } catch (error) {
-    await refundReservation(admin._id.toString());
-    console.error("meta image call failed", error);
-    return json({ ok: false, error: "META_ERROR", message: "Image API did not respond." }, 502);
+    await refundReservation(admin._id.toString(), model);
+    console.error(`${model} image call failed`, error);
+    return json({ ok: false, error: "UPSTREAM_ERROR", message: "Image API did not respond." }, 502);
   }
 
-  if (!meta.ok) {
-    await refundReservation(admin._id.toString());
-    return new NextResponse(await meta.arrayBuffer(), {
-      status: meta.status,
-      headers: passthrough(meta),
+  if (!upstream.ok) {
+    await refundReservation(admin._id.toString(), model);
+    return new NextResponse(await upstream.arrayBuffer(), {
+      status: upstream.status,
+      headers: passthrough(upstream),
     });
   }
 
@@ -179,10 +213,14 @@ export async function POST(request: NextRequest) {
     userEmail: userEmailFrom(request, admin.email),
     remainingCredits: reserved.credits,
     source: "image",
+    model,
   });
 
-  return new NextResponse(await meta.arrayBuffer(), {
+  return new NextResponse(await upstream.arrayBuffer(), {
     status: 200,
-    headers: passthrough(meta, { "x-credits-remaining": String(reserved.credits) }),
+    headers: passthrough(upstream, {
+      "x-credits-remaining": String(reserved.credits),
+      "x-model": model,
+    }),
   });
 }

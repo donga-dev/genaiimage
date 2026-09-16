@@ -19,26 +19,31 @@ export default async function DashboardPage() {
           Welcome back, <span className="gradient-text">{admin.name.split(" ")[0]}</span>
         </h1>
         <p className="mt-2 text-sm leading-6 text-muted md:text-base">
-          {admin.companyName} · Buy credits here. Each image generate uses one.
+          {admin.companyName} · Buy v1 and v2 packs separately. Each generate uses 1 credit from that model.
         </p>
       </div>
 
-      <section className="gradient-border overflow-hidden rounded-[22px] p-5 md:rounded-[28px] md:p-8">
-        <div className="flex flex-col gap-5 sm:flex-row sm:flex-wrap sm:items-end sm:justify-between">
-          <div>
-            <p className="text-sm text-muted">AI credits remaining</p>
-            <p className="serif mt-2 text-5xl gradient-text md:text-6xl">{admin.credits}</p>
-            <p className="mt-3 text-sm text-muted">
-              {admin.credits === 0
-                ? "Your workspace is out of credits. Buy a pack to keep image generate running."
-                : "Each image generate uses 1 credit."}
-            </p>
-          </div>
-          <Link href="/plans" className="btn btn-primary w-full sm:w-auto">
-            Buy credits
-          </Link>
+      <section className="grid gap-4 md:grid-cols-2">
+        <div className="gradient-border overflow-hidden rounded-[22px] p-5 md:rounded-[28px] md:p-8">
+          <p className="font-mono text-sm text-muted">genaiimg-v1</p>
+          <p className="serif mt-2 text-5xl gradient-text md:text-6xl">{admin.creditsV1}</p>
+          <p className="mt-3 text-sm text-muted">
+            {admin.creditsV1 === 0 ? "No v1 credits. Buy a genaiimg-v1 pack." : "Used when the API sends x-model: genaiimg-v1."}
+          </p>
+        </div>
+        <div className="gradient-border overflow-hidden rounded-[22px] p-5 md:rounded-[28px] md:p-8">
+          <p className="font-mono text-sm text-muted">genaiimg-v2</p>
+          <p className="serif mt-2 text-5xl gradient-text md:text-6xl">{admin.creditsV2}</p>
+          <p className="mt-3 text-sm text-muted">
+            {admin.creditsV2 === 0 ? "No v2 credits. Buy a genaiimg-v2 pack." : "Used when the API sends x-model: genaiimg-v2."}
+          </p>
         </div>
       </section>
+      <div>
+        <Link href="/plans" className="btn btn-primary w-full sm:w-auto">
+          Buy credits
+        </Link>
+      </div>
 
       <section className="grid gap-4 md:grid-cols-3">
         <Stat
@@ -91,7 +96,7 @@ export default async function DashboardPage() {
                   <p className="break-all text-sm font-medium">{row.userEmail}</p>
                   <p className="mt-1 text-xs text-muted">{formatDate(row.createdAt, true)}</p>
                   <p className="mt-2 text-sm text-muted">
-                    {row.source ?? "image"} · {row.remainingCredits} left
+                    {row.source ?? "image"} · {row.model ?? "genaiimg-v1"} · {row.remainingCredits} left
                   </p>
                 </article>
               ))}
@@ -102,7 +107,7 @@ export default async function DashboardPage() {
                   <tr>
                     <th className="pb-3 font-medium">When</th>
                     <th className="pb-3 font-medium">Used by</th>
-                    <th className="pb-3 font-medium">Feature</th>
+                    <th className="pb-3 font-medium">Model</th>
                     <th className="pb-3 font-medium">Left after</th>
                   </tr>
                 </thead>
@@ -111,7 +116,7 @@ export default async function DashboardPage() {
                     <tr key={row.id} className="border-t border-line">
                       <td className="py-3">{formatDate(row.createdAt, true)}</td>
                       <td className="py-3">{row.userEmail}</td>
-                      <td className="py-3 text-muted">{row.source ?? "—"}</td>
+                      <td className="py-3 text-muted">{row.model ?? "genaiimg-v1"}</td>
                       <td className="py-3">{row.remainingCredits}</td>
                     </tr>
                   ))}

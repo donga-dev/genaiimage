@@ -1,10 +1,10 @@
 import { Types } from "mongoose";
 import { NextRequest, NextResponse } from "next/server";
+import { logCreditUse, reserveCredit } from "@/lib/credits";
 import { connectDB } from "@/lib/db";
+import { parseImageModel } from "@/lib/image-models";
 import { requireInternalToken } from "@/lib/internal-auth";
 import { deductSchema } from "@/lib/validators";
-import { Admin } from "@/models/Admin";
-import { Usage } from "@/models/Usage";
 
 export async function POST(request: NextRequest) {
   const unauthorized = requireInternalToken(request);
@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { adminId, adminEmail, userEmail, source } = parsed.data;
+    const { adminId, adminEmail, userEmail, source, model: rawModel } = parsed.data;
     if (!Types.ObjectId.isValid(adminId)) {
       return NextResponse.json(
         { ok: false, error: "ADMIN_NOT_FOUND", message: "Admin not found" },
@@ -29,16 +29,11 @@ export async function POST(request: NextRequest) {
     }
 
     await connectDB();
+    const model = parseImageModel(rawModel) || parseImageModel(request.headers.get("x-model")) || "genaiimg-v1";
+    const reserved = await reserveCredit(adminId, adminEmail, model);
 
-    const admin = await Admin.findOneAndUpdate(
-      { _id: adminId, email: adminEmail, credits: { $gte: 1 } },
-      { $inc: { credits: -1 } },
-      { returnDocument: "after" },
-    );
-
-    if (!admin) {
-      const exists = await Admin.findOne({ _id: adminId, email: adminEmail }).lean();
-      if (!exists) {
+    if (!reserved.ok) {
+      if (reserved.reason === "not_found") {
         return NextResponse.json(
           { ok: false, error: "ADMIN_NOT_FOUND", message: "Admin not found" },
           { status: 404 },
@@ -49,7 +44,8 @@ export async function POST(request: NextRequest) {
         {
           ok: false,
           error: "INSUFFICIENT_CREDITS",
-          message: "No credits remaining. Purchase a credit pack to continue.",
+          message: `No ${model} credits remaining. Purchase a ${model} pack to continue.`,
+          model,
           credits: 0,
           hasCredits: false,
         },
@@ -57,21 +53,22 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const usage = await Usage.create({
-      adminId: admin._id,
-      adminEmail: admin.email,
+    const usageId = await logCreditUse({
+      adminId,
+      adminEmail,
       userEmail,
-      creditsUsed: 1,
-      remainingCredits: admin.credits,
-      source: source ?? null,
+      remainingCredits: reserved.credits,
+      source: source ?? "image",
+      model,
     });
 
     return NextResponse.json({
       ok: true,
       creditsUsed: 1,
-      remainingCredits: admin.credits,
-      hasCredits: admin.credits > 0,
-      usageId: usage._id.toString(),
+      remainingCredits: reserved.credits,
+      hasCredits: reserved.credits > 0,
+      model,
+      usageId,
       userEmail,
     });
   } catch (error) {

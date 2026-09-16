@@ -7,6 +7,8 @@ export type AdminDoc = {
   phone: string;
   passwordHash: string;
   credits: number;
+  creditsV1: number;
+  creditsV2: number;
   lastPurchaseDate: Date | null;
   currentPlanId: Types.ObjectId | null;
   createdAt: Date;
@@ -21,6 +23,8 @@ const AdminSchema = new Schema<AdminDoc>(
     phone: { type: String, required: true, trim: true },
     passwordHash: { type: String, required: true, select: false },
     credits: { type: Number, default: 0, min: 0 },
+    creditsV1: { type: Number, default: 0, min: 0 },
+    creditsV2: { type: Number, default: 0, min: 0 },
     lastPurchaseDate: { type: Date, default: null },
     currentPlanId: { type: Schema.Types.ObjectId, ref: "Plan", default: null },
   },

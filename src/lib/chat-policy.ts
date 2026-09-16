@@ -67,7 +67,7 @@ export function cannedHowTo(text: string) {
     return [
       "Two models on Buy credits: genaiimg-v1 and genaiimg-v2. v2 packs cost more.",
       "1. genaiimg-v1: Starter 100 at ₹15, Growth 500 at ₹10, Bulk 5000 at ₹8.",
-      "2. genaiimg-v2: Starter 100 at ₹25, Growth 500 at ₹18, Bulk 5000 at ₹14.",
+      "2. genaiimg-v2: Starter 100 at ₹20, Growth 500 at ₹15, Bulk 5000 at ₹12.",
       "3. Pick the model first, then the pack.",
     ].join("\n");
   }
@@ -125,9 +125,9 @@ export function cannedHowTo(text: string) {
 
   if (/\b(how credits work|what (is|are) (a )?credits?|does chat (use|cost|deduct))\b/i.test(t)) {
     return [
-      "One image generate uses one credit. Unused credits stay.",
+      "v1 and v2 credits are separate. A v1 call cannot spend v2 credits.",
       "1. This Chat is free and never deducts credits.",
-      "2. Buy a pack when you want more. There is no monthly expiry.",
+      "2. Buy the matching pack when that model is empty.",
     ].join("\n");
   }
 
@@ -152,13 +152,13 @@ export function buildChatSystemPrompt() {
     "Facts:",
     "- Buy credits: left sidebar → Buy credits → pick genaiimg-v1 or genaiimg-v2 → pick Starter, Growth, or Bulk → pay with Razorpay.",
     "- genaiimg-v1: Starter 100 credits ₹15 each. Growth 500 credits ₹10 each. Bulk 5000 credits ₹8 each.",
-    "- genaiimg-v2: Starter 100 credits ₹25 each. Growth 500 credits ₹18 each. Bulk 5000 credits ₹14 each. Dummy prices, higher than v1.",
+    "- genaiimg-v2: Starter 100 credits ₹20 each. Growth 500 credits ₹15 each. Bulk 5000 credits ₹12 each.",
     "- Activity: see who used a credit and when.",
     "- Billing: past purchases.",
     "- Workspace: edit name, company, and phone.",
     "- API keys: generate a key, copy it once, paste it in your product.",
     "- API docs: public page for generate image and check workspace credits. Point people there. Do not paste curl, keys, or payloads.",
-    "- Credits are only for image generate. 1 image generate uses 1 credit. Unused credits stay. This support Chat does not use credits.",
+    "- Credits: v1 and v2 are separate balances. Generate with x-model genaiimg-v1 or genaiimg-v2. 1 generate uses 1 credit from that model only. This support Chat does not use credits.",
     "- Support page shows tickets created from Chat.",
   ].join("\n");
 }

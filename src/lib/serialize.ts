@@ -1,4 +1,5 @@
 import type { PublicAdmin, PublicPlan, PublicPurchase, PublicUsage } from "@/types";
+import { splitCredits } from "@/lib/image-models";
 import type { PlanDoc } from "@/models/Plan";
 
 type LeanAdmin = {
@@ -8,6 +9,8 @@ type LeanAdmin = {
   email: string;
   phone: string;
   credits: number;
+  creditsV1?: number;
+  creditsV2?: number;
   lastPurchaseDate?: Date | null;
   currentPlanId?: unknown;
   createdAt: Date;
@@ -22,6 +25,7 @@ function isPopulatedPlan(value: unknown): value is LeanPlan {
 type LeanPurchase = {
   _id: { toString(): string };
   planName: string;
+  model?: string | null;
   credits: number;
   pricePerCredit: number;
   amountPaid: number;
@@ -37,6 +41,7 @@ type LeanUsage = {
   creditsUsed: number;
   remainingCredits: number;
   source?: string | null;
+  model?: string | null;
   createdAt: Date;
 };
 
@@ -57,6 +62,7 @@ export function serializePlan(plan: LeanPlan): PublicPlan {
 
 export function serializeAdmin(admin: LeanAdmin): PublicAdmin {
   const plan = isPopulatedPlan(admin.currentPlanId) ? admin.currentPlanId : null;
+  const split = splitCredits(admin);
 
   return {
     id: admin._id.toString(),
@@ -64,7 +70,9 @@ export function serializeAdmin(admin: LeanAdmin): PublicAdmin {
     companyName: admin.companyName,
     email: admin.email,
     phone: admin.phone,
-    credits: admin.credits,
+    credits: split.credits,
+    creditsV1: split.creditsV1,
+    creditsV2: split.creditsV2,
     lastPurchaseDate: admin.lastPurchaseDate ? admin.lastPurchaseDate.toISOString() : null,
     currentPlan: plan ? serializePlan(plan) : null,
     createdAt: admin.createdAt.toISOString(),
@@ -75,6 +83,7 @@ export function serializePurchase(purchase: LeanPurchase): PublicPurchase {
   return {
     id: purchase._id.toString(),
     planName: purchase.planName,
+    model: purchase.model ?? null,
     credits: purchase.credits,
     pricePerCredit: purchase.pricePerCredit,
     amountPaid: purchase.amountPaid,
@@ -92,6 +101,7 @@ export function serializeUsage(usage: LeanUsage): PublicUsage {
     creditsUsed: usage.creditsUsed,
     remainingCredits: usage.remainingCredits,
     source: usage.source ?? null,
+    model: usage.model ?? null,
     createdAt: usage.createdAt.toISOString(),
   };
 }

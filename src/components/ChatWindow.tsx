@@ -94,7 +94,15 @@ function chipsFor(messages: ChatMessage[]): Chip[] {
   ];
 }
 
-export function ChatWindow({ firstName = "", credits = 0 }: { firstName?: string; credits?: number }) {
+export function ChatWindow({
+  firstName = "",
+  creditsV1 = 0,
+  creditsV2 = 0,
+}: {
+  firstName?: string;
+  creditsV1?: number;
+  creditsV2?: number;
+}) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [pending, setPending] = useState(false);
@@ -203,7 +211,9 @@ export function ChatWindow({ firstName = "", credits = 0 }: { firstName?: string
                 <span className="relative h-1.5 w-1.5 rounded-full bg-ok" />
               </span>
               <span>Online · free chat</span>
-              <span className="hidden sm:inline">· {credits} credits on hand</span>
+              <span className="hidden sm:inline">
+                · v1 {creditsV1} · v2 {creditsV2}
+              </span>
             </p>
           </div>
         </div>

@@ -7,6 +7,7 @@ export type UsageDoc = {
   creditsUsed: number;
   remainingCredits: number;
   source: string | null;
+  model: string | null;
   createdAt: Date;
   updatedAt: Date;
 };
@@ -19,6 +20,7 @@ const UsageSchema = new Schema<UsageDoc>(
     creditsUsed: { type: Number, required: true, min: 1 },
     remainingCredits: { type: Number, required: true, min: 0 },
     source: { type: String, default: null, trim: true },
+    model: { type: String, default: null, trim: true, index: true },
   },
   { timestamps: true },
 );

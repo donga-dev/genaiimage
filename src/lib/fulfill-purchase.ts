@@ -1,6 +1,8 @@
 import type { HydratedDocument } from "mongoose";
+import { creditField, type ImageModelId } from "@/lib/image-models";
 import { connectDB } from "@/lib/db";
 import { Admin } from "@/models/Admin";
+import { Plan } from "@/models/Plan";
 import { Purchase, type PurchaseDoc } from "@/models/Purchase";
 
 type FulfillResult =
@@ -68,8 +70,18 @@ export async function fulfillPaidPurchase(input: {
     return { ok: false, status: 409, error: "ORDER_NOT_PAYABLE", message: "This order cannot be completed" };
   }
 
+  const model: ImageModelId =
+    purchase.model === "genaiimg-v2"
+      ? "genaiimg-v2"
+      : purchase.model === "genaiimg-v1"
+        ? "genaiimg-v1"
+        : (await Plan.findById(purchase.planId).lean())?.model === "genaiimg-v2"
+          ? "genaiimg-v2"
+          : "genaiimg-v1";
+  const field = creditField(model);
+
   await Admin.findByIdAndUpdate(purchase.adminId, {
-    $inc: { credits: purchase.credits },
+    $inc: { [field]: purchase.credits, credits: purchase.credits },
     $set: { lastPurchaseDate: now, currentPlanId: purchase.planId },
   });
 

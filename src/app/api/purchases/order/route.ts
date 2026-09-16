@@ -70,6 +70,7 @@ export async function POST(request: Request) {
       adminId: admin.id,
       planId: plan._id,
       planName: `${plan.name} · ${plan.model || "genaiimg-v1"}`,
+      model: plan.model || "genaiimg-v1",
       credits: plan.credits,
       pricePerCredit: plan.pricePerCredit,
       amountPaid: plan.totalPrice,

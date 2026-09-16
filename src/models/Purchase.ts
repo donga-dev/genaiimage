@@ -6,6 +6,7 @@ export type PurchaseDoc = {
   adminId: Types.ObjectId;
   planId: Types.ObjectId;
   planName: string;
+  model: string;
   credits: number;
   pricePerCredit: number;
   amountPaid: number;
@@ -23,6 +24,7 @@ const PurchaseSchema = new Schema<PurchaseDoc>(
     adminId: { type: Schema.Types.ObjectId, ref: "Admin", required: true, index: true },
     planId: { type: Schema.Types.ObjectId, ref: "Plan", required: true },
     planName: { type: String, required: true },
+    model: { type: String, default: "genaiimg-v1", trim: true },
     credits: { type: Number, required: true },
     pricePerCredit: { type: Number, required: true },
     amountPaid: { type: Number, required: true },

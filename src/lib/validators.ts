@@ -45,6 +45,7 @@ export const creditLookupSchema = z.object({
 export const deductSchema = creditLookupSchema.extend({
   userEmail: z.string().trim().email("userEmail must be a valid email").toLowerCase(),
   source: z.string().trim().max(80).optional(),
+  model: z.string().trim().optional(),
 });
 
 export const apiKeyNameSchema = z.object({

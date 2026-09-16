@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { splitCredits, readImageModel } from "@/lib/image-models";
 import { findWorkspaceByApiKey, isWorkspaceApiKey, readWorkspaceApiKey } from "@/lib/workspace-api-key";
 import { ApiToken } from "@/models/ApiToken";
 
@@ -6,7 +7,7 @@ export const runtime = "nodejs";
 
 const CORS = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "Authorization, Content-Type, x-api-key",
+  "Access-Control-Allow-Headers": "Authorization, Content-Type, x-api-key, x-model, x-version",
   "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
 };
 
@@ -34,12 +35,27 @@ async function checkCredits(request: NextRequest) {
 
   await ApiToken.findByIdAndUpdate(resolved.apiKey._id, { lastUsedAt: new Date() });
 
-  const credits = resolved.admin.credits;
-  return json({
-    ok: true,
-    credits,
-    hasCredits: credits > 0,
-  }, 200);
+  const split = splitCredits(resolved.admin);
+  const requested = readImageModel(request);
+  const remaining = requested ? (requested === "genaiimg-v2" ? split.creditsV2 : split.creditsV1) : undefined;
+
+  return json(
+    {
+      ok: true,
+      credits: {
+        "genaiimg-v1": split.creditsV1,
+        "genaiimg-v2": split.creditsV2,
+      },
+      hasCredits: {
+        "genaiimg-v1": split.creditsV1 > 0,
+        "genaiimg-v2": split.creditsV2 > 0,
+      },
+      ...(requested
+        ? { model: requested, remaining, hasModelCredits: (remaining ?? 0) > 0 }
+        : {}),
+    },
+    200,
+  );
 }
 
 export async function GET(request: NextRequest) {

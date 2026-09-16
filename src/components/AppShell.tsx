@@ -48,9 +48,18 @@ export function AppShell({ admin, children }: { admin: PublicAdmin; children: Re
         <Logo />
         <div className="gradient-border mt-6 shrink-0 rounded-3xl px-4 py-4 md:mt-8">
           <p className="text-[11px] uppercase tracking-[0.16em] text-muted">Credits left</p>
-          <p className="serif mt-1 text-4xl gradient-text">{admin.credits}</p>
-          <p className="mt-1 text-xs text-muted">
-            {admin.currentPlan ? admin.currentPlan.name : "No pack purchased yet"}
+          <div className="mt-3 grid grid-cols-2 gap-3">
+            <div>
+              <p className="font-mono text-[11px] text-muted">v1</p>
+              <p className="serif text-3xl gradient-text">{admin.creditsV1}</p>
+            </div>
+            <div>
+              <p className="font-mono text-[11px] text-muted">v2</p>
+              <p className="serif text-3xl gradient-text">{admin.creditsV2}</p>
+            </div>
+          </div>
+          <p className="mt-2 text-xs text-muted">
+            {admin.currentPlan ? `${admin.currentPlan.name} · ${admin.currentPlan.model}` : "No pack purchased yet"}
           </p>
         </div>
         <nav className="mt-6 flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto md:mt-8">
@@ -105,7 +114,9 @@ export function AppShell({ admin, children }: { admin: PublicAdmin; children: Re
           </div>
           <div className="shrink-0 rounded-full border border-line bg-white/5 px-3 py-1.5 text-right text-sm">
             <p className="text-[11px] text-muted">Balance</p>
-            <p className="font-medium gradient-text">{admin.credits} credits</p>
+            <p className="font-medium gradient-text">
+              v1 {admin.creditsV1} · v2 {admin.creditsV2}
+            </p>
           </div>
         </header>
         <main

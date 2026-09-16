@@ -29,7 +29,7 @@ export default async function UsagePage({ searchParams }: { searchParams: Search
         <p className="text-xs uppercase tracking-[0.18em] text-brass sm:text-sm">Activity</p>
         <h1 className="serif mt-2 text-3xl gradient-text md:text-4xl">Image generate</h1>
         <p className="mt-2 text-sm leading-6 text-muted md:text-base">
-          Each image generate stores the user email, the time, and credits left.
+          Each image generate stores the user email, the model, the time, and credits left for that model.
         </p>
       </div>
 
@@ -65,7 +65,7 @@ export default async function UsagePage({ searchParams }: { searchParams: Search
                   <p className="break-all text-sm font-medium">{row.userEmail}</p>
                   <p className="mt-1 text-xs text-muted">{formatDate(row.createdAt, true)}</p>
                   <p className="mt-2 text-sm text-muted">
-                    Used {row.creditsUsed} · {row.remainingCredits} left · {row.source ?? "image"}
+                    Used {row.creditsUsed} · {row.model ?? "genaiimg-v1"} · {row.remainingCredits} left
                   </p>
                 </article>
               ))}
@@ -76,9 +76,9 @@ export default async function UsagePage({ searchParams }: { searchParams: Search
                   <tr>
                     <th className="pb-3 font-medium">Date</th>
                     <th className="pb-3 font-medium">Used by</th>
+                    <th className="pb-3 font-medium">Model</th>
                     <th className="pb-3 font-medium">Credits used</th>
                     <th className="pb-3 font-medium">Remaining</th>
-                    <th className="pb-3 font-medium">Feature</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -86,9 +86,9 @@ export default async function UsagePage({ searchParams }: { searchParams: Search
                     <tr key={row.id} className="border-t border-line">
                       <td className="py-3">{formatDate(row.createdAt, true)}</td>
                       <td className="py-3">{row.userEmail}</td>
+                      <td className="py-3 font-mono text-xs">{row.model ?? "genaiimg-v1"}</td>
                       <td className="py-3">{row.creditsUsed}</td>
                       <td className="py-3">{row.remainingCredits}</td>
-                      <td className="py-3 text-muted">{row.source ?? "—"}</td>
                     </tr>
                   ))}
                 </tbody>
