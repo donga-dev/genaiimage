@@ -67,7 +67,7 @@ export function cannedHowTo(text: string) {
     return [
       "Two models on Buy credits: genaiimg-v1 and genaiimg-v2. v2 packs cost more.",
       "1. genaiimg-v1: Starter 100 at ₹15, Growth 500 at ₹10, Bulk 5000 at ₹8.",
-      "2. genaiimg-v2: Starter 100 at ₹20, Growth 500 at ₹15, Bulk 5000 at ₹12.",
+      "2. genaiimg-v2: Starter 100 at ₹20, Growth 2000 at ₹15, Bulk 5000 at ₹12.",
       "3. Pick the model first, then the pack.",
     ].join("\n");
   }
@@ -152,7 +152,7 @@ export function buildChatSystemPrompt() {
     "Facts:",
     "- Buy credits: left sidebar → Buy credits → pick genaiimg-v1 or genaiimg-v2 → pick Starter, Growth, or Bulk → pay with Razorpay.",
     "- genaiimg-v1: Starter 100 credits ₹15 each. Growth 500 credits ₹10 each. Bulk 5000 credits ₹8 each.",
-    "- genaiimg-v2: Starter 100 credits ₹20 each. Growth 500 credits ₹15 each. Bulk 5000 credits ₹12 each.",
+    "- genaiimg-v2: Starter 100 credits ₹20 each. Growth 2000 credits ₹15 each. Bulk 5000 credits ₹12 each.",
     "- Activity: see who used a credit and when.",
     "- Billing: past purchases.",
     "- Workspace: edit name, company, and phone.",

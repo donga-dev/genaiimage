@@ -25,7 +25,7 @@ export function PlanCatalog({
         <p className="text-sm uppercase tracking-[0.18em] text-brass">Choose a model</p>
         <h2 className="serif mt-2 text-2xl md:text-3xl">genaiimg-v1 or genaiimg-v2</h2>
         <p className="mt-2 max-w-2xl text-muted">
-          Pack prices follow the model you pick. v2 costs more than v1. You can change this later.
+          Pack prices follow the model you pick. v2 costs more than v1.
         </p>
         <div className="mt-5 grid gap-3 sm:grid-cols-2">
           {IMAGE_MODELS.map((id) => {
@@ -42,7 +42,7 @@ export function PlanCatalog({
               >
                 <p className="font-mono text-lg">{id}</p>
                 <p className="mt-1 text-sm text-muted">
-                  {id === "genaiimg-v1" ? "Current packs and prices" : "Newer model · higher dummy prices"}
+                  {id === "genaiimg-v1" ? "Standard model" : "Newer model"}
                 </p>
                 {selected ? (
                   <p className="mt-3 text-xs uppercase tracking-[0.14em] text-brass">Selected</p>
