@@ -15,7 +15,14 @@ const generateV2Curl = `curl -X POST "${BASE}/api/v1/image" \\
   -H "Content-Type: application/json" \\
   -H "x-model: genaiimg-v2" \\
   -H "x-user-email: artist@client.com" \\
-  -d "{\\"image\\":\\"https://example.com/source.png\\",\\"prompt\\":\\"your prompt here\\"}"`;
+  -d "{\\"image\\":\\"https://example.com/source.png\\",\\"prompt\\":\\"your prompt here\\",\\"size\\":\\"944x816\\"}"`;
+
+const generateV3Curl = `curl -X POST "${BASE}/api/v1/image" \\
+  -H "Authorization: Bearer gai_YOUR_KEY" \\
+  -H "Content-Type: application/json" \\
+  -H "x-model: genaiimg-v3" \\
+  -H "x-user-email: artist@client.com" \\
+  -d "{\\"image\\":\\"https://example.com/source.png\\",\\"prompt\\":\\"your prompt here\\",\\"aspectRatio\\":\\"5:4\\"}"`;
 
 const creditsCurl = `curl -X GET "${BASE}/api/v1/credits" \\
   -H "Authorization: Bearer gai_YOUR_KEY"`;
@@ -29,9 +36,9 @@ export function ApiDocs() {
           Two calls. One <span className="gradient-text">API key</span>.
         </h1>
         <p className="mt-3 max-w-2xl text-sm leading-6 text-muted md:text-base">
-          Same workspace API key for both. Send <span className="font-mono text-text">x-model</span> as
-          genaiimg-v1 or genaiimg-v2. Each call spends 1 credit from that model’s pack, not from the
-          other. Check credits reads both balances and spends nothing.
+          Same workspace API key for all three. Send <span className="font-mono text-text">x-model</span> as
+          genaiimg-v1, genaiimg-v2, or genaiimg-v3. Each call spends 1 credit from that model’s pack, not from
+          the others. Check credits reads all balances and spends nothing.
         </p>
       </div>
 
@@ -53,35 +60,52 @@ export function ApiDocs() {
         </div>
         <p className="mt-3 text-sm text-muted">
           Or send <code className="text-brass">x-api-key</code>. Use{" "}
-          <code className="text-brass">x-model: genaiimg-v2</code> for v2.
+          <code className="text-brass">x-model: genaiimg-v2</code> or{" "}
+          <code className="text-brass">x-model: genaiimg-v3</code> for those models.
         </p>
       </section>
 
       <section id="generate-image" className="panel scroll-mt-24 rounded-[22px] p-5 md:rounded-[28px] md:p-6">
         <EndpointHead n="1" method="POST" path="/api/v1/image" title="Generate image" />
         <p className="mt-3 text-sm leading-6 text-muted">
-          Send the source image, a prompt, and <code className="text-brass">x-model</code>. v1 uses the
-          current Meta image edit. v2 uses OpenAI image edit. 1 credit is taken from that model’s
-          balance only if generate succeeds.
+          Send the source image, a prompt, and <code className="text-brass">x-model</code>. v1 uses Meta
+          image edit. v2 uses OpenAI image edit. v3 uses Gemini image edit. 1 credit is taken from that
+          model’s balance only if generate succeeds.
         </p>
         <dl className="mt-5 grid gap-3 sm:grid-cols-2">
-          <DocField name="x-model" required text="genaiimg-v1 or genaiimg-v2. Required on every generate call." />
+          <DocField
+            name="x-model"
+            required
+            text="genaiimg-v1, genaiimg-v2, or genaiimg-v3. Required on every generate call."
+          />
           <DocField name="image" required text="URL, data URL, or raw base64. image_url also works." />
           <DocField name="prompt" required text="Required string in the JSON body." />
+          <DocField
+            name="size"
+            required
+            text="Required for genaiimg-v2 only. WIDTHxHEIGHT string, e.g. 944x816."
+          />
+          <DocField
+            name="aspectRatio"
+            required
+            text="Required for genaiimg-v3 only. e.g. 5:4, 16:9, 1:1. aspect_ratio also works."
+          />
           <DocField
             name="x-user-email"
             text="Optional header for Activity only. Does not change whose credits are spent."
           />
           <DocField name="v1 credits" text="Deducted only when x-model is genaiimg-v1." />
           <DocField name="v2 credits" text="Deducted only when x-model is genaiimg-v2." />
+          <DocField name="v3 credits" text="Deducted only when x-model is genaiimg-v3." />
         </dl>
         <div className="mt-5 space-y-4">
           <CopyCode label="curl · genaiimg-v1" code={generateCurl} />
           <CopyCode label="curl · genaiimg-v2" code={generateV2Curl} />
+          <CopyCode label="curl · genaiimg-v3" code={generateV3Curl} />
           <CopyCode
             label="Success · 200"
             code={`x-credits-remaining: 35
-x-model: genaiimg-v1
+x-model: genaiimg-v3
 
 { "data": [{ "b64_json": "..." }] }`}
           />
@@ -91,7 +115,7 @@ x-model: genaiimg-v1
       <section id="check-credits" className="panel scroll-mt-24 rounded-[22px] p-5 md:rounded-[28px] md:p-6">
         <EndpointHead n="2" method="GET" path="/api/v1/credits" title="Check credits" />
         <p className="mt-3 text-sm leading-6 text-muted">
-          Returns v1 and v2 balances for this API key. Optional{" "}
+          Returns v1, v2, and v3 balances for this API key. Optional{" "}
           <code className="text-brass">x-model</code> also returns that model’s remaining count. Do not
           send a user email. This call spends nothing.
         </p>
@@ -105,8 +129,8 @@ x-model: genaiimg-v1
             label="Success · 200"
             code={`{
   "ok": true,
-  "credits": { "genaiimg-v1": 36, "genaiimg-v2": 0 },
-  "hasCredits": { "genaiimg-v1": true, "genaiimg-v2": false }
+  "credits": { "genaiimg-v1": 36, "genaiimg-v2": 0, "genaiimg-v3": 12 },
+  "hasCredits": { "genaiimg-v1": true, "genaiimg-v2": false, "genaiimg-v3": true }
 }`}
           />
         </div>

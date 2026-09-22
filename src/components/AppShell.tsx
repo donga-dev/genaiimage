@@ -48,17 +48,21 @@ export function AppShell({ admin, children }: { admin: PublicAdmin; children: Re
         <Logo />
         <div className="gradient-border mt-6 shrink-0 rounded-3xl px-4 py-4 md:mt-8">
           <p className="text-[11px] uppercase tracking-[0.16em] text-muted">Credits left</p>
-          <div className="mt-3 grid grid-cols-2 gap-3">
-            <div>
-              <p className="font-mono text-[11px] text-muted">v1</p>
-              <p className="serif text-3xl gradient-text">{admin.creditsV1}</p>
-            </div>
-            <div>
-              <p className="font-mono text-[11px] text-muted">v2</p>
-              <p className="serif text-3xl gradient-text">{admin.creditsV2}</p>
-            </div>
-          </div>
-          <p className="mt-2 text-xs text-muted">
+          <ul className="mt-3 space-y-2.5">
+            {(
+              [
+                ["v1", admin.creditsV1],
+                ["v2", admin.creditsV2],
+                ["v3", admin.creditsV3],
+              ] as const
+            ).map(([label, value]) => (
+              <li key={label} className="flex items-baseline justify-between gap-3">
+                <span className="font-mono text-[11px] uppercase tracking-[0.12em] text-muted">{label}</span>
+                <span className="serif text-[1.65rem] leading-none tabular-nums gradient-text">{value}</span>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-3 truncate text-xs text-muted">
             {admin.currentPlan ? `${admin.currentPlan.name} · ${admin.currentPlan.model}` : "No pack purchased yet"}
           </p>
         </div>
@@ -112,11 +116,22 @@ export function AppShell({ admin, children }: { admin: PublicAdmin; children: Re
               {admin.companyName} · {admin.name}
             </p>
           </div>
-          <div className="shrink-0 rounded-full border border-line bg-white/5 px-3 py-1.5 text-right text-sm">
-            <p className="text-[11px] text-muted">Balance</p>
-            <p className="font-medium gradient-text">
-              v1 {admin.creditsV1} · v2 {admin.creditsV2}
-            </p>
+          <div className="shrink-0 rounded-2xl border border-line bg-white/5 px-3 py-2">
+            <p className="text-[10px] uppercase tracking-[0.14em] text-muted">Balance</p>
+            <div className="mt-1.5 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+              {(
+                [
+                  ["v1", admin.creditsV1],
+                  ["v2", admin.creditsV2],
+                  ["v3", admin.creditsV3],
+                ] as const
+              ).map(([label, value]) => (
+                <div key={label} className="flex items-baseline gap-1.5">
+                  <span className="font-mono text-[10px] text-muted">{label}</span>
+                  <span className="text-sm font-medium tabular-nums gradient-text">{value}</span>
+                </div>
+              ))}
+            </div>
           </div>
         </header>
         <main

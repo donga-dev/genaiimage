@@ -23,13 +23,15 @@ export function PlanCatalog({
     <div className="space-y-6 md:space-y-8">
       <section>
         <p className="text-sm uppercase tracking-[0.18em] text-brass">Choose a model</p>
-        <h2 className="serif mt-2 text-2xl md:text-3xl">genaiimg-v1 or genaiimg-v2</h2>
+        <h2 className="serif mt-2 text-2xl md:text-3xl">genaiimg-v1, v2, or v3</h2>
         <p className="mt-2 max-w-2xl text-muted">
-          Pack prices follow the model you pick. v2 costs more than v1.
+          Pack prices follow the model you pick. v2 and v3 cost the same; v1 is cheaper.
         </p>
-        <div className="mt-5 grid gap-3 sm:grid-cols-2">
+        <div className="mt-5 grid gap-3 sm:grid-cols-3">
           {IMAGE_MODELS.map((id) => {
             const selected = model === id;
+            const label =
+              id === "genaiimg-v1" ? "Standard model" : id === "genaiimg-v2" ? "Newer model" : "Advanced model";
             return (
               <button
                 key={id}
@@ -41,9 +43,7 @@ export function PlanCatalog({
                 )}
               >
                 <p className="font-mono text-lg">{id}</p>
-                <p className="mt-1 text-sm text-muted">
-                  {id === "genaiimg-v1" ? "Standard model" : "Newer model"}
-                </p>
+                <p className="mt-1 text-sm text-muted">{label}</p>
                 {selected ? (
                   <p className="mt-3 text-xs uppercase tracking-[0.14em] text-brass">Selected</p>
                 ) : (
@@ -71,7 +71,7 @@ export function PlanCatalog({
       ) : (
         <div className="grid gap-5 md:grid-cols-3">
           {visible.map((plan) => {
-            const featured = plan.slug === "bulk" || plan.slug === "bulk-v2";
+            const featured = plan.slug === "bulk" || plan.slug === "bulk-v2" || plan.slug === "bulk-v3";
             return (
               <article
                 key={plan.id}

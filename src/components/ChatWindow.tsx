@@ -98,10 +98,12 @@ export function ChatWindow({
   firstName = "",
   creditsV1 = 0,
   creditsV2 = 0,
+  creditsV3 = 0,
 }: {
   firstName?: string;
   creditsV1?: number;
   creditsV2?: number;
+  creditsV3?: number;
 }) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
@@ -212,7 +214,7 @@ export function ChatWindow({
               </span>
               <span>Online · free chat</span>
               <span className="hidden sm:inline">
-                · v1 {creditsV1} · v2 {creditsV2}
+                · v1 {creditsV1} · v2 {creditsV2} · v3 {creditsV3}
               </span>
             </p>
           </div>

@@ -10,11 +10,12 @@ export async function migrateSplitCredits() {
         $and: [
           { $eq: [{ $ifNull: ["$creditsV1", 0] }, 0] },
           { $eq: [{ $ifNull: ["$creditsV2", 0] }, 0] },
+          { $eq: [{ $ifNull: ["$creditsV3", 0] }, 0] },
           { $gt: [{ $ifNull: ["$credits", 0] }, 0] },
         ],
       },
     },
-    [{ $set: { creditsV1: "$credits", creditsV2: 0 } }],
+    [{ $set: { creditsV1: "$credits", creditsV2: 0, creditsV3: 0 } }],
   );
 }
 

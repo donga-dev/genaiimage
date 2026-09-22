@@ -19,7 +19,13 @@ const PlanSchema = new Schema<PlanDoc>(
   {
     slug: { type: String, required: true, unique: true, trim: true },
     name: { type: String, required: true, trim: true },
-    model: { type: String, required: true, enum: ["genaiimg-v1", "genaiimg-v2"], default: "genaiimg-v1", index: true },
+    model: {
+      type: String,
+      required: true,
+      enum: ["genaiimg-v1", "genaiimg-v2", "genaiimg-v3"],
+      default: "genaiimg-v1",
+      index: true,
+    },
     description: { type: String, required: true, trim: true },
     credits: { type: Number, required: true, min: 1 },
     pricePerCredit: { type: Number, required: true, min: 0 },

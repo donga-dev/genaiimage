@@ -9,6 +9,7 @@ export default async function ChatPage() {
         firstName={admin.name.trim().split(/\s+/)[0] ?? ""}
         creditsV1={admin.creditsV1}
         creditsV2={admin.creditsV2}
+        creditsV3={admin.creditsV3}
       />
     </div>
   );

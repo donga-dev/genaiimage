@@ -7,6 +7,7 @@ export type PublicAdmin = {
   credits: number;
   creditsV1: number;
   creditsV2: number;
+  creditsV3: number;
   lastPurchaseDate: string | null;
   currentPlan: PublicPlan | null;
   createdAt: string;

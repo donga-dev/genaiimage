@@ -37,7 +37,13 @@ async function checkCredits(request: NextRequest) {
 
   const split = splitCredits(resolved.admin);
   const requested = readImageModel(request);
-  const remaining = requested ? (requested === "genaiimg-v2" ? split.creditsV2 : split.creditsV1) : undefined;
+  const remaining = requested
+    ? requested === "genaiimg-v3"
+      ? split.creditsV3
+      : requested === "genaiimg-v2"
+        ? split.creditsV2
+        : split.creditsV1
+    : undefined;
 
   return json(
     {
@@ -45,10 +51,12 @@ async function checkCredits(request: NextRequest) {
       credits: {
         "genaiimg-v1": split.creditsV1,
         "genaiimg-v2": split.creditsV2,
+        "genaiimg-v3": split.creditsV3,
       },
       hasCredits: {
         "genaiimg-v1": split.creditsV1 > 0,
         "genaiimg-v2": split.creditsV2 > 0,
+        "genaiimg-v3": split.creditsV3 > 0,
       },
       ...(requested
         ? { model: requested, remaining, hasModelCredits: (remaining ?? 0) > 0 }

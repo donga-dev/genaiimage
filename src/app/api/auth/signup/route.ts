@@ -37,6 +37,7 @@ export async function POST(request: Request) {
       credits: 0,
       creditsV1: 0,
       creditsV2: 0,
+      creditsV3: 0,
     });
 
     const token = await signSession({ adminId: admin._id.toString(), email });

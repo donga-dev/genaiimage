@@ -19,11 +19,11 @@ export default async function DashboardPage() {
           Welcome back, <span className="gradient-text">{admin.name.split(" ")[0]}</span>
         </h1>
         <p className="mt-2 text-sm leading-6 text-muted md:text-base">
-          {admin.companyName} · Buy v1 and v2 packs separately. Each generate uses 1 credit from that model.
+          {admin.companyName} · Buy v1, v2, and v3 packs separately. Each generate uses 1 credit from that model.
         </p>
       </div>
 
-      <section className="grid gap-4 md:grid-cols-2">
+      <section className="grid gap-4 md:grid-cols-3">
         <div className="gradient-border overflow-hidden rounded-[22px] p-5 md:rounded-[28px] md:p-8">
           <p className="font-mono text-sm text-muted">genaiimg-v1</p>
           <p className="serif mt-2 text-5xl gradient-text md:text-6xl">{admin.creditsV1}</p>
@@ -36,6 +36,13 @@ export default async function DashboardPage() {
           <p className="serif mt-2 text-5xl gradient-text md:text-6xl">{admin.creditsV2}</p>
           <p className="mt-3 text-sm text-muted">
             {admin.creditsV2 === 0 ? "No v2 credits. Buy a genaiimg-v2 pack." : "Used when the API sends x-model: genaiimg-v2."}
+          </p>
+        </div>
+        <div className="gradient-border overflow-hidden rounded-[22px] p-5 md:rounded-[28px] md:p-8">
+          <p className="font-mono text-sm text-muted">genaiimg-v3</p>
+          <p className="serif mt-2 text-5xl gradient-text md:text-6xl">{admin.creditsV3}</p>
+          <p className="mt-3 text-sm text-muted">
+            {admin.creditsV3 === 0 ? "No v3 credits. Buy a genaiimg-v3 pack." : "Used when the API sends x-model: genaiimg-v3."}
           </p>
         </div>
       </section>

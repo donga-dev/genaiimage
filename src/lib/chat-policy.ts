@@ -65,10 +65,11 @@ export function cannedHowTo(text: string) {
 
   if (/\b(which pack|best pack|best plan|show (me )?(the )?packs|compare packs|cheapest pack)\b/i.test(t)) {
     return [
-      "Two models on Buy credits: genaiimg-v1 and genaiimg-v2. v2 packs cost more.",
+      "Three models on Buy credits: genaiimg-v1, genaiimg-v2, and genaiimg-v3. v2 and v3 packs cost the same.",
       "1. genaiimg-v1: Starter 100 at ₹15, Growth 2000 at ₹10, Bulk 5000 at ₹8.",
       "2. genaiimg-v2: Starter 100 at ₹20, Growth 2000 at ₹15, Bulk 5000 at ₹12.",
-      "3. Pick the model first, then the pack.",
+      "3. genaiimg-v3: Starter 100 at ₹20, Growth 2000 at ₹15, Bulk 5000 at ₹12.",
+      "4. Pick the model first, then the pack.",
     ].join("\n");
   }
 
@@ -76,7 +77,7 @@ export function cannedHowTo(text: string) {
     return [
       "You buy a one-time pack. Credits land after Razorpay payment.",
       "1. Open Buy credits in the left sidebar.",
-      "2. Pick genaiimg-v1 or genaiimg-v2, then Starter, Growth, or Bulk.",
+      "2. Pick genaiimg-v1, genaiimg-v2, or genaiimg-v3, then Starter, Growth, or Bulk.",
       "3. Pay with Razorpay. Unused credits stay.",
     ].join("\n");
   }
@@ -125,7 +126,7 @@ export function cannedHowTo(text: string) {
 
   if (/\b(how credits work|what (is|are) (a )?credits?|does chat (use|cost|deduct))\b/i.test(t)) {
     return [
-      "v1 and v2 credits are separate. A v1 call cannot spend v2 credits.",
+      "v1, v2, and v3 credits are separate. A v1 call cannot spend v2 or v3 credits.",
       "1. This Chat is free and never deducts credits.",
       "2. Buy the matching pack when that model is empty.",
     ].join("\n");
@@ -150,15 +151,16 @@ export function buildChatSystemPrompt() {
     "Do not write long paragraphs. Do not use markdown headings. Do not say Avatar, Marketplace, Project Settings, Agents, or Search. The product only does image generate. This Chat tab is support only.",
     "",
     "Facts:",
-    "- Buy credits: left sidebar → Buy credits → pick genaiimg-v1 or genaiimg-v2 → pick Starter, Growth, or Bulk → pay with Razorpay.",
+    "- Buy credits: left sidebar → Buy credits → pick genaiimg-v1, genaiimg-v2, or genaiimg-v3 → pick Starter, Growth, or Bulk → pay with Razorpay.",
     "- genaiimg-v1: Starter 100 credits ₹15 each. Growth 2000 credits ₹10 each. Bulk 5000 credits ₹8 each.",
     "- genaiimg-v2: Starter 100 credits ₹20 each. Growth 2000 credits ₹15 each. Bulk 5000 credits ₹12 each.",
+    "- genaiimg-v3: Starter 100 credits ₹20 each. Growth 2000 credits ₹15 each. Bulk 5000 credits ₹12 each.",
     "- Activity: see who used a credit and when.",
     "- Billing: past purchases.",
     "- Workspace: edit name, company, and phone.",
     "- API keys: generate a key, copy it once, paste it in your product.",
     "- API docs: public page for generate image and check workspace credits. Point people there. Do not paste curl, keys, or payloads.",
-    "- Credits: v1 and v2 are separate balances. Generate with x-model genaiimg-v1 or genaiimg-v2. 1 generate uses 1 credit from that model only. This support Chat does not use credits.",
+    "- Credits: v1, v2, and v3 are separate balances. Generate with x-model genaiimg-v1, genaiimg-v2, or genaiimg-v3. 1 generate uses 1 credit from that model only. This support Chat does not use credits.",
     "- Support page shows tickets created from Chat.",
   ].join("\n");
 }
@@ -173,6 +175,8 @@ function secretValues() {
     process.env.RAZORPAY_WEBHOOK_SECRET,
     process.env.MONGODB_URI,
     process.env.META_API_KEY,
+    process.env.OPENAI_API_KEY,
+    process.env.GEMINI_API_KEY,
   ].filter((value): value is string => Boolean(value && value.length > 6));
 }
 

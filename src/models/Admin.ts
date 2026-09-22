@@ -9,6 +9,7 @@ export type AdminDoc = {
   credits: number;
   creditsV1: number;
   creditsV2: number;
+  creditsV3: number;
   lastPurchaseDate: Date | null;
   currentPlanId: Types.ObjectId | null;
   createdAt: Date;
@@ -25,6 +26,7 @@ const AdminSchema = new Schema<AdminDoc>(
     credits: { type: Number, default: 0, min: 0 },
     creditsV1: { type: Number, default: 0, min: 0 },
     creditsV2: { type: Number, default: 0, min: 0 },
+    creditsV3: { type: Number, default: 0, min: 0 },
     lastPurchaseDate: { type: Date, default: null },
     currentPlanId: { type: Schema.Types.ObjectId, ref: "Plan", default: null },
   },

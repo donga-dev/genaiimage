@@ -15,9 +15,9 @@ Admin-only Next.js portal. Admins sign up, buy credit packs, and their other pro
 
 | Pack | Credits | Rate | Total |
 | --- | --- | --- | --- |
-| Starter | 10 | ₹10 / credit | ₹100 |
-| Growth | 50 | ₹9 / credit | ₹450 |
-| Bulk | 100 | ₹8 / credit | ₹800 |
+| Starter | 100 | ₹15 / credit | ₹1,500 |
+| Growth | 2000 | ₹10 / credit | ₹20,000 |
+| Bulk | 5000 | ₹8 / credit | ₹40,000 |
 
 Buy more at once → cheaper per credit. Edit `scripts/seed.ts` and run `npm run seed` again to upsert new rates.
 

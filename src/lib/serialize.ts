@@ -11,6 +11,7 @@ type LeanAdmin = {
   credits: number;
   creditsV1?: number;
   creditsV2?: number;
+  creditsV3?: number;
   lastPurchaseDate?: Date | null;
   currentPlanId?: unknown;
   createdAt: Date;
@@ -73,6 +74,7 @@ export function serializeAdmin(admin: LeanAdmin): PublicAdmin {
     credits: split.credits,
     creditsV1: split.creditsV1,
     creditsV2: split.creditsV2,
+    creditsV3: split.creditsV3,
     lastPurchaseDate: admin.lastPurchaseDate ? admin.lastPurchaseDate.toISOString() : null,
     currentPlan: plan ? serializePlan(plan) : null,
     createdAt: admin.createdAt.toISOString(),

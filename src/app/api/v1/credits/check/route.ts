@@ -45,6 +45,7 @@ export async function POST(request: NextRequest) {
       credits: {
         "genaiimg-v1": split.creditsV1,
         "genaiimg-v2": split.creditsV2,
+        "genaiimg-v3": split.creditsV3,
       },
       adminId: admin._id.toString(),
       adminEmail: admin.email,
