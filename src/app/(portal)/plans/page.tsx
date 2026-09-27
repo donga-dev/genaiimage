@@ -1,14 +1,10 @@
 import { PlanCatalog } from "@/components/PlanCatalog";
 import { requireAdmin } from "@/lib/auth";
 import { BRAND } from "@/lib/brand";
-import { connectDB } from "@/lib/db";
-import { serializePlan } from "@/lib/serialize";
-import { Plan } from "@/models/Plan";
+import { listActivePlans } from "@/lib/portal-cache";
 
 export default async function PlansPage() {
-  const admin = await requireAdmin();
-  await connectDB();
-  const plans = (await Plan.find({ isActive: true }).sort({ sortOrder: 1 }).lean()).map(serializePlan);
+  const [admin, plans] = await Promise.all([requireAdmin(), listActivePlans()]);
 
   return (
     <div className="mx-auto max-w-6xl space-y-6 md:space-y-8">

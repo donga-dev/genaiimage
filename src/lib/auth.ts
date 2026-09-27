@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { redirect } from "next/navigation";
@@ -10,6 +11,13 @@ import type { PublicAdmin } from "@/types";
 
 void Plan;
 
+const ADMIN_TTL_MS = 20_000;
+const adminHits = new Map<string, { at: number; admin: PublicAdmin }>();
+
+export function forgetAdminCache(adminId: string) {
+  adminHits.delete(adminId);
+}
+
 export async function getSessionPayload() {
   const cookieStore = await cookies();
   const token = cookieStore.get(SESSION_COOKIE)?.value;
@@ -17,16 +25,23 @@ export async function getSessionPayload() {
   return verifySession(token);
 }
 
-export async function getCurrentAdmin(): Promise<PublicAdmin | null> {
+export const getCurrentAdmin = cache(async (): Promise<PublicAdmin | null> => {
   const session = await getSessionPayload();
   if (!session) return null;
+
+  const hit = adminHits.get(session.adminId);
+  if (hit && hit.admin.email === session.email && Date.now() - hit.at < ADMIN_TTL_MS) {
+    return hit.admin;
+  }
 
   await connectDB();
   const admin = await Admin.findById(session.adminId).populate("currentPlanId").lean();
   if (!admin || admin.email !== session.email) return null;
 
-  return serializeAdmin(admin);
-}
+  const publicAdmin = serializeAdmin(admin);
+  adminHits.set(session.adminId, { at: Date.now(), admin: publicAdmin });
+  return publicAdmin;
+});
 
 export async function requireAdmin(): Promise<PublicAdmin> {
   const admin = await getCurrentAdmin();

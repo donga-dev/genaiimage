@@ -1,15 +1,15 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { UsageChart } from "@/components/UsageChart";
-import { requireAdmin } from "@/lib/auth";
+import { getSessionPayload, requireAdmin } from "@/lib/auth";
 import { BRAND } from "@/lib/brand";
-import { getDashboardData } from "@/lib/dashboard";
-import { connectDB } from "@/lib/db";
+import { cachedDashboard } from "@/lib/portal-cache";
 import { formatDate } from "@/lib/utils";
 
 export default async function DashboardPage() {
-  const admin = await requireAdmin();
-  await connectDB();
-  const data = await getDashboardData(admin.id);
+  const session = await getSessionPayload();
+  if (!session) redirect("/login");
+  const [admin, data] = await Promise.all([requireAdmin(), cachedDashboard(session.adminId)]);
 
   return (
     <div className="mx-auto max-w-6xl space-y-6 md:space-y-8">

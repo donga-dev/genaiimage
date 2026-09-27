@@ -1,14 +1,13 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { ApiKeysPanel } from "@/components/ApiKeysPanel";
-import { requireAdmin } from "@/lib/auth";
-import { serializeApiToken } from "@/lib/api-tokens";
-import { connectDB } from "@/lib/db";
-import { ApiToken } from "@/models/ApiToken";
+import { getSessionPayload, requireAdmin } from "@/lib/auth";
+import { listWorkspaceKeys } from "@/lib/portal-cache";
 
 export default async function ApiKeysPage() {
-  const admin = await requireAdmin();
-  await connectDB();
-  const keys = await ApiToken.find({ adminId: admin.id, revokedAt: null }).sort({ createdAt: -1 }).lean();
+  const session = await getSessionPayload();
+  if (!session) redirect("/login");
+  const [, keys] = await Promise.all([requireAdmin(), listWorkspaceKeys(session.adminId)]);
 
   return (
     <div className="mx-auto max-w-5xl space-y-6 md:space-y-8">
@@ -25,7 +24,7 @@ export default async function ApiKeysPage() {
       </div>
 
       <section className="panel rounded-[22px] p-4 md:rounded-[28px] md:p-6">
-        <ApiKeysPanel initialKeys={keys.map((key) => serializeApiToken(key))} />
+        <ApiKeysPanel initialKeys={keys} />
       </section>
     </div>
   );

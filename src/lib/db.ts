@@ -30,7 +30,9 @@ export async function connectDB() {
       cache.promise = mongoose
         .connect(MONGODB_URI, {
           bufferCommands: false,
-          serverSelectionTimeoutMS: 8000,
+          serverSelectionTimeoutMS: 5000,
+          maxPoolSize: 10,
+          family: 4,
         })
         .catch((error) => {
           cache.promise = null;
@@ -43,8 +45,12 @@ export async function connectDB() {
 
   if (!creditsMigrated) {
     creditsMigrated = true;
-    const { migrateSplitCredits } = await import("@/lib/credits");
-    await migrateSplitCredits();
+    void import("@/lib/credits")
+      .then((mod) => mod.migrateSplitCredits())
+      .catch((error) => {
+        creditsMigrated = false;
+        console.error("credit split migrate failed", error);
+      });
   }
 
   return cache.conn;

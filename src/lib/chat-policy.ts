@@ -177,6 +177,7 @@ function secretValues() {
     process.env.META_API_KEY,
     process.env.OPENAI_API_KEY,
     process.env.GEMINI_API_KEY,
+    process.env.SMTP_PASSWORD,
   ].filter((value): value is string => Boolean(value && value.length > 6));
 }
 

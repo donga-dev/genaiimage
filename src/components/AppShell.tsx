@@ -73,6 +73,7 @@ export function AppShell({ admin, children }: { admin: PublicAdmin; children: Re
               <Link
                 key={link.href}
                 href={link.href}
+                prefetch={false}
                 onClick={() => setOpen(false)}
                 className={cn(
                   "rounded-full px-3.5 py-2.5 text-sm transition-colors",

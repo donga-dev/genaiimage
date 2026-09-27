@@ -1,13 +1,13 @@
 import Link from "next/link";
-import { requireAdmin } from "@/lib/auth";
-import { connectDB } from "@/lib/db";
+import { redirect } from "next/navigation";
+import { getSessionPayload, requireAdmin } from "@/lib/auth";
+import { listTickets } from "@/lib/portal-cache";
 import { formatDate } from "@/lib/utils";
-import { Ticket } from "@/models/Ticket";
 
 export default async function SupportPage() {
-  const admin = await requireAdmin();
-  await connectDB();
-  const tickets = await Ticket.find({ adminId: admin.id }).sort({ createdAt: -1 }).lean();
+  const session = await getSessionPayload();
+  if (!session) redirect("/login");
+  const [, tickets] = await Promise.all([requireAdmin(), listTickets(session.adminId)]);
 
   return (
     <div className="mx-auto max-w-5xl space-y-6 md:space-y-8">

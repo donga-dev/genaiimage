@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { BRAND } from "@/lib/brand";
+import { PasswordField } from "@/components/PasswordField";
 
 type Mode = "login" | "signup";
 
@@ -61,13 +62,20 @@ export function AuthForm({ mode }: { mode: Mode }) {
         </>
       ) : null}
       <Field label="Work email" name="email" type="email" placeholder="you@company.com" autoComplete="email" />
-      <Field
+      <PasswordField
         label="Password"
         name="password"
-        type="password"
         placeholder="At least 8 characters"
         autoComplete={mode === "login" ? "current-password" : "new-password"}
+        minLength={mode === "signup" ? 8 : undefined}
       />
+      {mode === "login" ? (
+        <p className="text-right text-sm">
+          <Link href="/forgot-password" className="text-brass hover:underline">
+            Forgot password?
+          </Link>
+        </p>
+      ) : null}
 
       {error ? <p className="rounded-xl bg-danger/10 px-3 py-2 text-sm text-danger">{error}</p> : null}
 

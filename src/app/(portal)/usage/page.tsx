@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { requireAdmin } from "@/lib/auth";
+import { redirect } from "next/navigation";
+import { getSessionPayload, requireAdmin } from "@/lib/auth";
 import { getUsagePageData } from "@/lib/dashboard";
 import { connectDB } from "@/lib/db";
 import { formatDate } from "@/lib/utils";
@@ -7,16 +8,22 @@ import { formatDate } from "@/lib/utils";
 type Search = Promise<{ from?: string; to?: string; q?: string; page?: string }>;
 
 export default async function UsagePage({ searchParams }: { searchParams: Search }) {
-  const admin = await requireAdmin();
+  const session = await getSessionPayload();
+  if (!session) redirect("/login");
   const params = await searchParams;
   const page = Number(params.page ?? "1") || 1;
-  await connectDB();
-  const data = await getUsagePageData(admin.id, {
-    from: params.from,
-    to: params.to,
-    q: params.q,
-    page,
-  });
+  const [, data] = await Promise.all([
+    requireAdmin(),
+    (async () => {
+      await connectDB();
+      return getUsagePageData(session.adminId, {
+        from: params.from,
+        to: params.to,
+        q: params.q,
+        page,
+      });
+    })(),
+  ]);
 
   const query = new URLSearchParams();
   if (params.from) query.set("from", params.from);

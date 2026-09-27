@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { requireApiAdmin } from "@/lib/auth";
+import { forgetAdminCache, requireApiAdmin } from "@/lib/auth";
 import { connectDB } from "@/lib/db";
 import { serializeAdmin } from "@/lib/serialize";
 import { profileSchema } from "@/lib/validators";
@@ -30,6 +30,7 @@ export async function PATCH(request: Request) {
       );
     }
 
+    forgetAdminCache(current.id);
     return NextResponse.json({ ok: true, admin: serializeAdmin(admin) });
   } catch (error) {
     console.error("profile update failed", error);

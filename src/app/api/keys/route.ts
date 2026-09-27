@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { requireApiAdmin } from "@/lib/auth";
+import { forgetAdminPortalCache } from "@/lib/portal-cache";
 import { createApiTokenValue, serializeApiToken } from "@/lib/api-tokens";
 import { connectDB } from "@/lib/db";
 import { apiKeyNameSchema } from "@/lib/validators";
@@ -42,6 +43,7 @@ export async function POST(request: Request) {
     last4: created.last4,
   });
 
+  forgetAdminPortalCache(admin.id);
   return NextResponse.json({
     ok: true,
     token: created.token,

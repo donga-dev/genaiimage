@@ -114,11 +114,7 @@ body {
 }
 
 .orb {
-  position: absolute;
-  border-radius: 999px;
-  filter: blur(64px);
-  opacity: 0.85;
-  animation: drift 16s ease-in-out infinite;
+  display: none;
 }
 
 .orb-a {
@@ -183,10 +179,9 @@ body {
 }
 
 .panel {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.025));
+  background: linear-gradient(180deg, rgba(22, 24, 32, 0.96), rgba(14, 16, 22, 0.96));
   border: 1px solid var(--line);
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
-  backdrop-filter: blur(22px);
 }
 
 .gradient-border {

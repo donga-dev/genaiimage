@@ -1,3 +1,4 @@
+import { forgetAdminPortalCache } from "@/lib/portal-cache";
 import { Ticket } from "@/models/Ticket";
 
 export function isTicketRequest(text: string) {
@@ -16,5 +17,6 @@ export async function createSupportTicket(adminId: string, message: string) {
     status: "open",
   });
 
+  forgetAdminPortalCache(adminId);
   return ticket;
 }

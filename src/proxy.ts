@@ -2,13 +2,15 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { SESSION_COOKIE, verifySession } from "@/lib/session";
 
-const AUTH_PAGES = new Set(["/login", "/signup"]);
-const PUBLIC_PAGES = new Set(["/docs"]);
+const AUTH_PAGES = new Set(["/login", "/signup", "/forgot-password"]);
+const PUBLIC_PAGES = new Set(["/docs", "/reset-password"]);
 
 function isPublicApi(pathname: string) {
   return (
     pathname === "/api/auth/login" ||
     pathname === "/api/auth/signup" ||
+    pathname === "/api/auth/forgot-password" ||
+    pathname === "/api/auth/reset-password" ||
     pathname === "/api/purchases/webhook"
   );
 }

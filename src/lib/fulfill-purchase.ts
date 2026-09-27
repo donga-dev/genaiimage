@@ -1,6 +1,8 @@
 import type { HydratedDocument } from "mongoose";
+import { forgetAdminCache } from "@/lib/auth";
 import { creditField, isImageModelId, type ImageModelId } from "@/lib/image-models";
 import { connectDB } from "@/lib/db";
+import { forgetAdminPortalCache } from "@/lib/portal-cache";
 import { Admin } from "@/models/Admin";
 import { Plan } from "@/models/Plan";
 import { Purchase, type PurchaseDoc } from "@/models/Purchase";
@@ -80,6 +82,10 @@ export async function fulfillPaidPurchase(input: {
     $inc: { [field]: purchase.credits, credits: purchase.credits },
     $set: { lastPurchaseDate: now, currentPlanId: purchase.planId },
   });
+
+  const adminId = purchase.adminId.toString();
+  forgetAdminCache(adminId);
+  forgetAdminPortalCache(adminId);
 
   return { ok: true, alreadyFulfilled: false, purchase };
 }

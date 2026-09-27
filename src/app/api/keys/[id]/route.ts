@@ -1,6 +1,7 @@
 import { Types } from "mongoose";
 import { NextResponse } from "next/server";
 import { requireApiAdmin } from "@/lib/auth";
+import { forgetAdminPortalCache } from "@/lib/portal-cache";
 import { connectDB } from "@/lib/db";
 import { ApiToken } from "@/models/ApiToken";
 
@@ -24,5 +25,6 @@ export async function DELETE(_request: Request, { params }: { params: Promise<{ 
     return NextResponse.json({ ok: false, error: "NOT_FOUND", message: "Key not found" }, { status: 404 });
   }
 
+  forgetAdminPortalCache(admin.id);
   return NextResponse.json({ ok: true });
 }

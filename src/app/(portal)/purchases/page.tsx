@@ -1,8 +1,7 @@
-import { requireAdmin } from "@/lib/auth";
-import { connectDB } from "@/lib/db";
-import { serializePurchase } from "@/lib/serialize";
+import { redirect } from "next/navigation";
+import { getSessionPayload, requireAdmin } from "@/lib/auth";
+import { listPurchases } from "@/lib/portal-cache";
 import { cn, formatDate, formatINR } from "@/lib/utils";
-import { Purchase } from "@/models/Purchase";
 
 const statusLabel: Record<string, string> = {
   completed: "Paid",
@@ -11,11 +10,9 @@ const statusLabel: Record<string, string> = {
 };
 
 export default async function PurchasesPage() {
-  const admin = await requireAdmin();
-  await connectDB();
-  const purchases = (await Purchase.find({ adminId: admin.id }).sort({ purchasedAt: -1 }).lean()).map(
-    serializePurchase,
-  );
+  const session = await getSessionPayload();
+  if (!session) redirect("/login");
+  const [, purchases] = await Promise.all([requireAdmin(), listPurchases(session.adminId)]);
 
   return (
     <div className="mx-auto max-w-6xl space-y-6 md:space-y-8">
