@@ -22,7 +22,7 @@ const generateV3Curl = `curl -X POST "${BASE}/api/v1/image" \\
   -H "Content-Type: application/json" \\
   -H "x-model: genaiimg-v3" \\
   -H "x-user-email: artist@client.com" \\
-  -d "{\\"image\\":\\"https://example.com/source.png\\",\\"prompt\\":\\"your prompt here\\",\\"aspectRatio\\":\\"5:4\\"}"`;
+  -d "{\\"image\\":\\"https://example.com/source.png\\",\\"prompt\\":\\"your prompt here\\",\\"aspectRatio\\":\\"5:4\\",\\"size\\":\\"1152x928\\"}"`;
 
 const creditsCurl = `curl -X GET "${BASE}/api/v1/credits" \\
   -H "Authorization: Bearer gai_YOUR_KEY"`;
@@ -83,7 +83,7 @@ export function ApiDocs() {
           <DocField
             name="size"
             required
-            text="Required for genaiimg-v2 only. WIDTHxHEIGHT string, e.g. 944x816."
+            text="Required for genaiimg-v2 and genaiimg-v3. WIDTHxHEIGHT, e.g. 944x816. On v3 the long side picks 1K or 2K. Over 1536px uses 2K."
           />
           <DocField
             name="aspectRatio"

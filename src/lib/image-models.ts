@@ -24,6 +24,15 @@ export const GEMINI_ASPECT_RATIOS = [
 
 export type GeminiAspectRatio = (typeof GEMINI_ASPECT_RATIOS)[number];
 
+export type GeminiImageSize = "1K" | "2K";
+
+/** Long side at or under 1536px (midpoint of 1024 and 2048) stays 1K. Larger sizes cap at 2K. */
+export function geminiImageSizeFromDimensions(size: string): GeminiImageSize {
+  const [width, height] = size.toLowerCase().split("x").map(Number);
+  const longSide = Math.max(width, height);
+  return longSide <= 1536 ? "1K" : "2K";
+}
+
 export function isImageModelId(value: string): value is ImageModelId {
   return IMAGE_MODELS.includes(value as ImageModelId);
 }

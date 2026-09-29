@@ -1,4 +1,5 @@
-import { GEMINI_IMAGE_MODEL, type GeminiAspectRatio } from "@/lib/image-models";
+import { compressImageLossless } from "@/lib/compress-image";
+import { GEMINI_IMAGE_MODEL, type GeminiAspectRatio, type GeminiImageSize } from "@/lib/image-models";
 
 const GEMINI_INTERACTIONS_URL = "https://generativelanguage.googleapis.com/v1beta/interactions";
 
@@ -30,6 +31,7 @@ export async function editImageWithGemini(input: {
   imageUrl: string;
   prompt: string;
   aspectRatio: GeminiAspectRatio;
+  imageSize: GeminiImageSize;
   apiKey: string;
 }) {
   const { mimeType, data } = await imageUrlToBase64(input.imageUrl);
@@ -49,10 +51,10 @@ export async function editImageWithGemini(input: {
       response_format: {
         type: "image",
         aspect_ratio: input.aspectRatio,
-        image_size: "1K",
+        image_size: input.imageSize,
       },
     }),
-    signal: AbortSignal.timeout(55_000),
+    signal: AbortSignal.timeout(240_000),
   });
 }
 
@@ -100,5 +102,5 @@ export async function geminiEditToB64Json(upstream: Response) {
     throw new Error("Gemini response missing image data");
   }
 
-  return { data: [{ b64_json: b64 }] };
+  return { data: [{ b64_json: await compressImageLossless(b64) }] };
 }

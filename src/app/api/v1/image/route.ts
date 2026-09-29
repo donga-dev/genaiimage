@@ -3,13 +3,13 @@ import { hashApiToken, readRequestApiToken } from "@/lib/api-tokens";
 import { logCreditUse, refundReservation, reserveCredit } from "@/lib/credits";
 import { connectDB } from "@/lib/db";
 import { geminiEditToB64Json, editImageWithGemini } from "@/lib/gemini-image-edit";
-import { isGeminiAspectRatio, readImageModel, type GeminiAspectRatio } from "@/lib/image-models";
+import { geminiImageSizeFromDimensions, isGeminiAspectRatio, readImageModel, type GeminiAspectRatio } from "@/lib/image-models";
 import { META_IMAGE_MODEL } from "@/lib/meta-image-prompt";
 import { editImageWithOpenAI, openAIEditToB64Json } from "@/lib/openai-image-edit";
 import { Admin } from "@/models/Admin";
 import { ApiToken } from "@/models/ApiToken";
 
-export const maxDuration = 60;
+export const maxDuration = 300;
 export const runtime = "nodejs";
 
 const META_IMAGE_URL = "https://api.meta.ai/v1/images/edits";
@@ -104,7 +104,7 @@ async function callMeta(imageUrl: string, prompt: string, metaKey: string) {
       images: [{ image_url: imageUrl }],
       response_format: "b64_json",
     }),
-    signal: AbortSignal.timeout(55_000),
+    signal: AbortSignal.timeout(240_000),
   });
 }
 
@@ -183,10 +183,14 @@ export async function POST(request: NextRequest) {
   }
 
   const size = readSize(incoming);
-  if (model === "genaiimg-v2") {
+  if (model === "genaiimg-v2" || model === "genaiimg-v3") {
     if (!size) {
       return json(
-        { ok: false, error: "INVALID_INPUT", message: "Send size in the JSON body for genaiimg-v2 (e.g. 944x816)." },
+        {
+          ok: false,
+          error: "INVALID_INPUT",
+          message: `Send size in the JSON body for ${model} (e.g. 944x816).`,
+        },
         400,
       );
     }
@@ -261,6 +265,7 @@ export async function POST(request: NextRequest) {
         imageUrl,
         prompt,
         aspectRatio: aspectRatio!,
+        imageSize: geminiImageSizeFromDimensions(size),
         apiKey: process.env.GEMINI_API_KEY!.trim(),
       });
     } else if (model === "genaiimg-v2") {

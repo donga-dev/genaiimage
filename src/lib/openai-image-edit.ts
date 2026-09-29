@@ -1,3 +1,4 @@
+import { compressImageLossless } from "@/lib/compress-image";
 import { OPENAI_IMAGE_MODEL } from "@/lib/image-models";
 
 const OPENAI_IMAGE_URL = "https://api.openai.com/v1/images/edits";
@@ -51,7 +52,7 @@ export async function editImageWithOpenAI(input: {
       Authorization: `Bearer ${input.apiKey}`,
     },
     body: form,
-    signal: AbortSignal.timeout(55_000),
+    signal: AbortSignal.timeout(240_000),
   });
 }
 
@@ -68,14 +69,14 @@ export async function openAIEditToB64Json(upstream: Response) {
 
   const first = payload.data?.[0];
   if (first?.b64_json) {
-    return { data: [{ b64_json: first.b64_json }] };
+    return { data: [{ b64_json: await compressImageLossless(first.b64_json) }] };
   }
 
   if (first?.url) {
     const image = await fetch(first.url, { signal: AbortSignal.timeout(20_000) });
     if (!image.ok) throw new Error("Could not download OpenAI result image");
     const b64 = Buffer.from(await image.arrayBuffer()).toString("base64");
-    return { data: [{ b64_json: b64 }] };
+    return { data: [{ b64_json: await compressImageLossless(b64) }] };
   }
 
   throw new Error("OpenAI response missing image data");
